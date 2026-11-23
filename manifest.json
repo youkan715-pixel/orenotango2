@@ -1,6 +1,6 @@
 {
-  "name": "単語帳",
-  "short_name": "単語帳",
+  "name": "俺の単語帳",
+  "short_name": "俺の単語帳",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
