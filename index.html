@@ -20,6 +20,7 @@
     --accent:#7fb2e0; --accent-text:#0d1620; --mask:#2a323d; --done:#6cc391; --warn:#f2867f; }
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--text);
   font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI","Segoe UI",sans-serif;
@@ -129,7 +130,7 @@ dialog textarea{min-height:72px;resize:vertical}
     <h2 id="dlgTitle">追加</h2>
     <label>英語<input id="fEn" required autocomplete="off" autocapitalize="off" spellcheck="false"></label>
     <label>日本語<textarea id="fJa" required></textarea></label>
-    <label id="fGroupWrap">グループ<input id="fGroup" list="groupList" autocomplete="off"><datalist id="groupList"></datalist></label>
+    <label id="fGroupWrap">グループ<select id="fGroupSel"></select><input id="fGroup" autocomplete="off" placeholder="新しいグループの名前" aria-label="新しいグループの名前"></label>
     <label id="fTypeWrap">型<select id="fType"></select></label>
     <p class="note" id="dlgNote"></p>
     <div class="dlg-actions">
@@ -178,7 +179,7 @@ function idiomGroups(items){
   for (const it of items){ const v = it.en.split(' ')[0].toLowerCase(); n[v] = (n[v] || 0) + 1; }
   for (const it of items){
     const v = it.en.split(' ')[0].toLowerCase();
-    it.group = n[v] > 1 ? v : 'その他 ' + TYPES[it.type];
+    it.group = it.g || (n[v] > 1 ? v : 'その他 ' + TYPES[it.type]); // g = 自分で選んだグループ
   }
 }
 const BASE = {
@@ -351,6 +352,9 @@ $('typeSel').innerHTML = '<option value="">すべての型</option>' +
   Object.keys(TYPES).map(k => '<option value="' + k + '">' + TYPES[k] + '</option>').join('');
 $('fType').innerHTML = Object.keys(TYPES).map(k => '<option value="' + k + '">' + TYPES[k] + '</option>').join('');
 
+const NEW_GROUP = '__new__';
+function syncGroupInput(){ $('fGroup').hidden = page !== 'words' && $('fGroupSel').value !== NEW_GROUP; }
+$('fGroupSel').addEventListener('change', () => { syncGroupInput(); if (!$('fGroup').hidden) $('fGroup').focus(); });
 function openDialog(id){
   const all = itemsOf(page);
   editing = id ? all.find(it => it.id === id) : null;
@@ -359,12 +363,24 @@ function openDialog(id){
   $('fEn').value = editing ? editing.en : '';
   $('fJa').value = editing ? editing.ja : '';
   const isIdiom = page === 'idioms';
-  $('fGroupWrap').hidden = isIdiom;
   $('fTypeWrap').hidden = !isIdiom;
-  $('fGroup').value = editing ? editing.group : ($('groupSel').value || ADDED);
-  $('groupList').innerHTML = groupNames(all).map(n => '<option value="' + esc(n) + '">').join('');
+  // 単語は自由入力。イディオムと複合名詞は今あるグループから選ぶ。
+  const pick = page !== 'words';
+  $('fGroupSel').hidden = !pick;
+  if (pick){
+    const names = groupNames(all);
+    if (!isIdiom && !names.includes(ADDED)) names.push(ADDED);
+    $('fGroupSel').innerHTML = (isIdiom ? '<option value="">自動（先頭の動詞で決める）</option>' : '') +
+      names.map(n => '<option value="' + esc(n) + '">' + esc(n) + '</option>').join('') +
+      '<option value="' + NEW_GROUP + '">＋ グループを追加</option>';
+    $('fGroupSel').value = isIdiom ? (editing && editing.g || '') : (editing ? editing.group : ($('groupSel').value || ADDED));
+    $('fGroup').value = '';
+  } else {
+    $('fGroup').value = editing ? editing.group : ($('groupSel').value || ADDED);
+  }
+  syncGroupInput();
   $('fType').value = editing && editing.type ? editing.type : ($('typeSel').value || 2);
-  $('dlgNote').textContent = isIdiom ? 'グループは先頭の動詞から自動で決まります。' : '';
+  $('dlgNote').textContent = isIdiom ? '「自動」のままにすると、先頭の動詞でグループが決まります。' : '';
   $('delBtn').hidden = !editing;
   $('dlg').showModal();
   $('fEn').focus();
@@ -375,7 +391,10 @@ $('form').addEventListener('submit', () => {
   const en = $('fEn').value.trim(), ja = $('fJa').value.trim();
   if (!en || !ja) return;
   const v = {en, ja};
-  if (page === 'idioms') v.type = +$('fType').value; else v.group = $('fGroup').value.trim() || ADDED;
+  const typed = $('fGroup').value.trim(), sel = $('fGroupSel').value;
+  if (page === 'words') v.group = typed || ADDED;
+  else if (page === 'nouns') v.group = sel === NEW_GROUP ? (typed || ADDED) : sel;
+  else { v.type = +$('fType').value; v.g = sel === NEW_GROUP ? typed : sel; }
   if (!editing){
     state.custom.push(Object.assign({id: 'c' + Date.now() + Math.floor(Math.random() * 1000), page}, v));
   } else if (editing.custom){
