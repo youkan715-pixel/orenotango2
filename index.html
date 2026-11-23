@@ -60,6 +60,14 @@ li.row.learned .en{color:var(--sub)}
 button.ja{border:0;background:transparent;text-align:left;padding:8px;margin:0;min-height:44px;overflow-wrap:anywhere}
 button.ja span{display:block;padding:2px 8px;border-radius:8px;background:var(--mask);color:transparent;user-select:none;min-height:1.5em}
 button.ja.show span{background:transparent;color:var(--text);user-select:text}
+button.ja i{font-style:normal}
+button.ja.rev span{background:transparent;color:var(--text);font-weight:600}
+button.ja.rev .rest{background:var(--mask);color:transparent;border-radius:6px;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+button.ja.rev.show .rest{background:transparent;color:inherit}
+button.ja.rev small{display:none;padding:0 8px;color:var(--sub);font-size:12px}
+button.ja.rev.show small{display:block}
+.en.q-ja{font-weight:500}
+li.row.rv{grid-template-columns:minmax(0,7fr) minmax(0,5fr) 44px 36px}
 .chk{display:flex;align-items:center;justify-content:center}
 .chk input{width:22px;height:22px;accent-color:var(--done)}
 button.edit{border:0;background:transparent;color:var(--sub);font-size:20px;padding:0}
@@ -95,6 +103,7 @@ dialog textarea{min-height:72px;resize:vertical}
       <select id="typeSel" aria-label="イディオムの型" hidden></select>
     </div>
     <div class="tools">
+      <button class="btn" id="dirBtn" aria-pressed="false">英→日</button>
       <button class="btn" id="onlyTodo" aria-pressed="false">未習得のみ</button>
       <button class="btn" id="shuffle" aria-pressed="false">シャッフル</button>
       <button class="btn" id="showAll">全部見せる</button>
@@ -193,6 +202,8 @@ function save(){
 /* ---------- 画面の状態 ---------- */
 let page = 'idioms';
 let onlyTodo = false, order = null, showAll = false;
+let dir = 'en'; // 'en' = 英語を見て日本語を答える / 'ja' = 日本語を見て英語を答える
+try { if (localStorage.getItem(KEY + '-dir') === 'ja') dir = 'ja'; } catch(e){}
 const revealed = new Set(), collapsed = new Set();
 
 function itemsOf(p){
@@ -218,15 +229,28 @@ function visible(items){
     (!onlyTodo || !state.learned[it.id]) &&
     (!q || it.en.toLowerCase().includes(q) || it.ja.toLowerCase().includes(q)));
 }
+// 日→英のときのヒント。イディオムは先頭の動詞、それ以外は最初の1文字だけ見せる。
+function hintSplit(it){
+  if (it.page === 'idioms'){ const i = it.en.indexOf(' '); return i < 0 ? [it.en, ''] : [it.en.slice(0, i), it.en.slice(i)]; }
+  return [it.en.slice(0, 1), it.en.slice(1)];
+}
 function rowHtml(it){
-  const shown = showAll || revealed.has(it.id);
-  let extra = '';
-  if (it.type) extra += '<span class="badge" title="' + esc(TYPES[it.type]) + '">' + TYPE_MARK[it.type] + '</span>';
-  if (it.dup) extra += '<span class="badge">' + esc(it.dup) + '回登場</span>';
-  if (it.orig) extra += '<small>メモのつづり：' + esc(it.orig) + '</small>';
-  return '<li class="row' + (state.learned[it.id] ? ' learned' : '') + '" data-id="' + esc(it.id) + '">' +
-    '<div class="en">' + esc(it.en) + extra + '</div>' +
-    '<button type="button" class="ja' + (shown ? ' show' : '') + '" aria-label="訳を表示・非表示"><span>' + esc(it.ja) + '</span></button>' +
+  const shown = showAll || revealed.has(it.id), rev = dir === 'ja';
+  let badges = '';
+  if (it.type) badges += '<span class="badge" title="' + esc(TYPES[it.type]) + '">' + TYPE_MARK[it.type] + '</span>';
+  if (it.dup) badges += '<span class="badge">' + esc(it.dup) + '回登場</span>';
+  const orig = it.orig ? '<small>メモのつづり：' + esc(it.orig) + '</small>' : '';
+  let q, a;
+  if (rev){
+    const [hint, rest] = hintSplit(it);
+    q = '<div class="en q-ja">' + esc(it.ja) + badges + '</div>';
+    a = '<span><i class="hint">' + esc(hint) + '</i><i class="rest">' + esc(rest) + '</i></span>' + orig;
+  } else {
+    q = '<div class="en">' + esc(it.en) + badges + orig + '</div>';
+    a = '<span>' + esc(it.ja) + '</span>';
+  }
+  return '<li class="row' + (rev ? ' rv' : '') + (state.learned[it.id] ? ' learned' : '') + '" data-id="' + esc(it.id) + '">' + q +
+    '<button type="button" class="ja' + (rev ? ' rev' : '') + (shown ? ' show' : '') + '" aria-label="答えを表示・非表示">' + a + '</button>' +
     '<label class="chk"><input type="checkbox" aria-label="覚えた"' + (state.learned[it.id] ? ' checked' : '') + '></label>' +
     '<button type="button" class="edit" aria-label="編集">⋯</button></li>';
 }
@@ -239,6 +263,8 @@ function render(){
   $('typeSel').hidden = page !== 'idioms';
   document.querySelectorAll('.tabs button').forEach(b => b.setAttribute('aria-selected', b.dataset.page === page));
   $('onlyTodo').setAttribute('aria-pressed', onlyTodo);
+  $('dirBtn').setAttribute('aria-pressed', dir === 'ja');
+  $('dirBtn').textContent = dir === 'ja' ? '日→英' : '英→日';
   $('shuffle').setAttribute('aria-pressed', !!order);
 
   const vis = visible(all);
@@ -276,6 +302,11 @@ document.querySelector('.tabs').addEventListener('click', e => {
 $('q').addEventListener('input', render);
 $('groupSel').addEventListener('change', render);
 $('typeSel').addEventListener('change', render);
+$('dirBtn').addEventListener('click', () => {
+  dir = dir === 'ja' ? 'en' : 'ja'; showAll = false; revealed.clear();
+  try { localStorage.setItem(KEY + '-dir', dir); } catch(e){}
+  render();
+});
 $('onlyTodo').addEventListener('click', () => { onlyTodo = !onlyTodo; render(); });
 $('shuffle').addEventListener('click', () => {
   if (order) order = null;
