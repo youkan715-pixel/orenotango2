@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>イディオム帳</title>
+<meta name="theme-color" content="#1f4e79">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="イディオム帳">
+<style>
+:root{
+  --bg:#f5f6f8; --card:#fff; --text:#1c2430; --sub:#6b7686; --line:#e1e5ea;
+  --accent:#1f4e79; --accent-text:#fff; --mask:#e3e8ee; --done:#2e7d4f; --warn:#b3261e;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#12161c; --card:#1b2129; --text:#e8ecf1; --sub:#98a3b3; --line:#2c3440;
+    --accent:#7fb2e0; --accent-text:#0d1620; --mask:#2a323d; --done:#6cc391; --warn:#f2867f; }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI","Segoe UI",sans-serif;
+  font-size:16px;line-height:1.5}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+header{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);
+  padding:calc(8px + env(safe-area-inset-top)) 12px 8px}
+.wrap{max-width:860px;margin:0 auto}
+.tabs{display:flex;gap:6px}
+.tabs button{flex:1;padding:10px 4px;border:1px solid var(--line);background:var(--card);
+  border-radius:10px;font-weight:600;min-height:44px}
+.tabs button[aria-selected="true"]{background:var(--accent);color:var(--accent-text);border-color:var(--accent)}
+.tools{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;align-items:center}
+.tools input[type=search],.tools select{flex:1 1 140px;min-width:0;padding:8px 10px;border:1px solid var(--line);
+  border-radius:8px;background:var(--card);min-height:40px}
+.btn{padding:8px 12px;border:1px solid var(--line);background:var(--card);border-radius:8px;min-height:40px;white-space:nowrap}
+.btn[aria-pressed="true"]{background:var(--accent);color:var(--accent-text);border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--accent-text);border-color:var(--accent);font-weight:600}
+.btn.danger{color:var(--warn);border-color:var(--warn)}
+.progress{margin-top:6px;font-size:13px;color:var(--sub);font-variant-numeric:tabular-nums}
+main{padding:10px 12px 110px}
+details.group{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:10px;overflow:hidden}
+details.group>summary{padding:10px 14px;font-weight:700;cursor:pointer;display:flex;justify-content:space-between;gap:8px;list-style:none}
+details.group>summary::-webkit-details-marker{display:none}
+details.group>summary::before{content:"▸";margin-right:6px;color:var(--sub)}
+details.group[open]>summary::before{content:"▾"}
+details.group>summary .gname{flex:1}
+details.group>summary .cnt{font-weight:400;color:var(--sub);font-size:13px;font-variant-numeric:tabular-nums}
+ul.rows{list-style:none;margin:0;padding:0}
+.flat{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+li.row{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr) 44px 36px;align-items:stretch;border-top:1px solid var(--line)}
+.flat li.row:first-child{border-top:0}
+li.row.learned .en{color:var(--sub)}
+.en{padding:10px 8px 10px 14px;font-weight:600;overflow-wrap:anywhere}
+.en small{display:block;font-weight:400;color:var(--sub);font-size:12px}
+.badge{display:inline-block;font-size:11px;font-weight:600;border:1px solid var(--line);border-radius:6px;padding:0 5px;margin-left:4px;color:var(--sub);vertical-align:middle}
+button.ja{border:0;background:transparent;text-align:left;padding:8px;margin:0;min-height:44px;overflow-wrap:anywhere}
+button.ja span{display:block;padding:2px 8px;border-radius:8px;background:var(--mask);color:transparent;user-select:none;min-height:1.5em}
+button.ja.show span{background:transparent;color:var(--text);user-select:text}
+.chk{display:flex;align-items:center;justify-content:center}
+.chk input{width:22px;height:22px;accent-color:var(--done)}
+button.edit{border:0;background:transparent;color:var(--sub);font-size:20px;padding:0}
+.empty{padding:32px 12px;text-align:center;color:var(--sub)}
+footer{position:fixed;left:0;right:0;bottom:0;background:var(--bg);border-top:1px solid var(--line);
+  padding:8px 12px calc(8px + env(safe-area-inset-bottom))}
+footer .wrap{display:flex;gap:6px;flex-wrap:wrap}
+footer .btn{flex:1 1 auto}
+dialog{border:1px solid var(--line);border-radius:14px;background:var(--card);color:var(--text);
+  width:min(480px,calc(100vw - 24px));padding:16px}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+dialog h2{margin:0 0 10px;font-size:18px}
+dialog label{display:block;font-size:13px;color:var(--sub);margin-top:10px}
+dialog input,dialog textarea,dialog select{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);margin-top:3px}
+dialog textarea{min-height:72px;resize:vertical}
+.dlg-actions{display:flex;gap:6px;margin-top:16px;flex-wrap:wrap}
+.dlg-actions .sp{flex:1}
+.note{font-size:12px;color:var(--sub);margin-top:8px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="tabs" role="tablist" style="display:none">
+      <button role="tab" data-page="words">単語</button>
+      <button role="tab" data-page="idioms">イディオム</button>
+      <button role="tab" data-page="nouns">複合名詞</button>
+    </div>
+    <div class="tools">
+      <input type="search" id="q" placeholder="検索" aria-label="検索">
+      <select id="groupSel" aria-label="グループ"></select>
+      <select id="typeSel" aria-label="イディオムの型" hidden></select>
+    </div>
+    <div class="tools">
+      <button class="btn" id="onlyTodo" aria-pressed="false">未習得のみ</button>
+      <button class="btn" id="shuffle" aria-pressed="false">シャッフル</button>
+      <button class="btn" id="showAll">全部見せる</button>
+      <button class="btn" id="hideAll">全部隠す</button>
+    </div>
+    <div class="progress" id="progress"></div>
+  </div>
+</header>
+
+<main><div class="wrap" id="list"></div></main>
+
+<footer>
+  <div class="wrap">
+    <button class="btn primary" id="addBtn">＋ 追加</button>
+    <button class="btn" id="exportBtn">書き出し</button>
+    <button class="btn" id="importBtn">読み込み</button>
+    <input type="file" id="importFile" accept="application/json,.json" hidden>
+  </div>
+</footer>
+
+<dialog id="dlg">
+  <form method="dialog" id="form">
+    <h2 id="dlgTitle">追加</h2>
+    <label>英語<input id="fEn" required autocomplete="off" autocapitalize="off" spellcheck="false"></label>
+    <label>日本語<textarea id="fJa" required></textarea></label>
+    <label id="fGroupWrap">グループ<input id="fGroup" list="groupList" autocomplete="off"><datalist id="groupList"></datalist></label>
+    <label id="fTypeWrap">型<select id="fType"></select></label>
+    <p class="note" id="dlgNote"></p>
+    <div class="dlg-actions">
+      <button type="button" class="btn danger" id="delBtn">削除</button>
+      <span class="sp"></span>
+      <button type="button" class="btn" id="cancelBtn">やめる</button>
+      <button type="submit" class="btn primary">保存</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="data.js"></script>
+<script>
+'use strict';
+const TYPES = {
+  1:'① 動詞＋副詞（自動詞）', 2:'② 動詞＋副詞（他動詞）', 3:'③ 動詞＋前置詞',
+  4:'④ 動詞＋副詞＋前置詞', 5:'⑤ 動詞＋A＋前置詞＋B'
+};
+const TYPE_MARK = {1:'①',2:'②',3:'③',4:'④',5:'⑤'};
+const PAGES = ['words','idioms','nouns'];
+const ADDED = '自分で追加';
+const KEY = 'idioms-v1';
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ---------- 元データを読む ---------- */
+function lines(t){ return t.split('\n').map(s => s.trim()).filter(Boolean); }
+function parseGrouped(page, text){
+  let g = ''; const out = [];
+  for (const l of lines(text)){
+    if (l.startsWith('# ')){ g = l.slice(2); continue; }
+    const [en, ja, orig, n] = l.split('|');
+    out.push({id: page + ':' + en, page, group: g, en, ja, orig: orig || '', dup: n || ''});
+  }
+  return out;
+}
+function parseIdioms(text){
+  return lines(text).map(l => {
+    const [type, en, ja] = l.split('|');
+    return {id: 'idioms:' + type + ':' + en, page: 'idioms', type: +type, en, ja};
+  });
+}
+// イディオムは先頭の動詞でまとめる。1つしかない動詞は型ごとの「その他」へ。
+function idiomGroups(items){
+  const n = {};
+  for (const it of items){ const v = it.en.split(' ')[0].toLowerCase(); n[v] = (n[v] || 0) + 1; }
+  for (const it of items){
+    const v = it.en.split(' ')[0].toLowerCase();
+    it.group = n[v] > 1 ? v : 'その他 ' + TYPES[it.type];
+  }
+}
+const BASE = {
+  words: parseGrouped('words', WORDS),
+  idioms: parseIdioms(IDIOMS),
+  nouns: parseGrouped('nouns', NOUNS)
+};
+
+/* ---------- 保存データ（この端末の中） ---------- */
+function blank(){ return {learned:{}, custom:[], edits:{}, deleted:{}}; }
+function load(){
+  try { return Object.assign(blank(), JSON.parse(localStorage.getItem(KEY)) || {}); }
+  catch(e){ return blank(); }
+}
+let state = load();
+function save(){
+  try { localStorage.setItem(KEY, JSON.stringify(state)); }
+  catch(e){ alert('保存できませんでした。ブラウザの設定で保存が止められている可能性があります。'); }
+}
+
+/* ---------- 画面の状態 ---------- */
+let page = 'idioms';
+let onlyTodo = false, order = null, showAll = false;
+const revealed = new Set(), collapsed = new Set();
+
+function itemsOf(p){
+  const base = BASE[p].filter(it => !state.deleted[it.id]).map(it => Object.assign({}, it, state.edits[it.id] || {}));
+  const all = base.concat(state.custom.filter(c => c.page === p).map(c => Object.assign({custom: true}, c)));
+  if (p === 'idioms') idiomGroups(all);
+  return all;
+}
+function groupNames(items){
+  const seen = [];
+  for (const it of items) if (!seen.includes(it.group)) seen.push(it.group);
+  if (page === 'idioms'){
+    const rest = seen.filter(g => g.startsWith('その他')).sort();
+    return seen.filter(g => !g.startsWith('その他')).sort().concat(rest);
+  }
+  return seen;
+}
+function visible(items){
+  const q = $('q').value.trim().toLowerCase(), g = $('groupSel').value, t = $('typeSel').value;
+  return items.filter(it =>
+    (!g || it.group === g) &&
+    (page !== 'idioms' || !t || String(it.type) === t) &&
+    (!onlyTodo || !state.learned[it.id]) &&
+    (!q || it.en.toLowerCase().includes(q) || it.ja.toLowerCase().includes(q)));
+}
+function rowHtml(it){
+  const shown = showAll || revealed.has(it.id);
+  let extra = '';
+  if (it.type) extra += '<span class="badge" title="' + esc(TYPES[it.type]) + '">' + TYPE_MARK[it.type] + '</span>';
+  if (it.dup) extra += '<span class="badge">' + esc(it.dup) + '回登場</span>';
+  if (it.orig) extra += '<small>メモのつづり：' + esc(it.orig) + '</small>';
+  return '<li class="row' + (state.learned[it.id] ? ' learned' : '') + '" data-id="' + esc(it.id) + '">' +
+    '<div class="en">' + esc(it.en) + extra + '</div>' +
+    '<button type="button" class="ja' + (shown ? ' show' : '') + '" aria-label="訳を表示・非表示"><span>' + esc(it.ja) + '</span></button>' +
+    '<label class="chk"><input type="checkbox" aria-label="覚えた"' + (state.learned[it.id] ? ' checked' : '') + '></label>' +
+    '<button type="button" class="edit" aria-label="編集">⋯</button></li>';
+}
+function render(){
+  const all = itemsOf(page), names = groupNames(all);
+  // グループの選択肢
+  const cur = $('groupSel').value;
+  $('groupSel').innerHTML = '<option value="">すべてのグループ</option>' +
+    names.map(n => '<option' + (n === cur ? ' selected' : '') + '>' + esc(n) + '</option>').join('');
+  $('typeSel').hidden = page !== 'idioms';
+  document.querySelectorAll('.tabs button').forEach(b => b.setAttribute('aria-selected', b.dataset.page === page));
+  $('onlyTodo').setAttribute('aria-pressed', onlyTodo);
+  $('shuffle').setAttribute('aria-pressed', !!order);
+
+  const vis = visible(all);
+  const done = all.filter(it => state.learned[it.id]).length;
+  $('progress').textContent = '覚えた ' + done + ' / ' + all.length + '　表示中 ' + vis.length + ' 件';
+
+  let html = '';
+  if (!vis.length){
+    html = '<p class="empty">' + (all.length ? '条件に合うものがありません。' : 'まだ何もありません。') + '</p>';
+  } else if (order){
+    const pos = new Map(order.map((id, i) => [id, i]));
+    const sorted = vis.slice().sort((a, b) => (pos.get(a.id) ?? 1e9) - (pos.get(b.id) ?? 1e9));
+    html = '<div class="flat"><ul class="rows">' + sorted.map(rowHtml).join('') + '</ul></div>';
+  } else {
+    for (const n of names){
+      const inG = vis.filter(it => it.group === n);
+      if (!inG.length) continue;
+      const total = all.filter(it => it.group === n);
+      const d = total.filter(it => state.learned[it.id]).length;
+      html += '<details class="group" data-g="' + esc(n) + '"' + (collapsed.has(page + '/' + n) ? '' : ' open') + '>' +
+        '<summary><span class="gname">' + esc(n) + '</span><span class="cnt">' + d + ' / ' + total.length + '</span></summary>' +
+        '<ul class="rows">' + inG.map(rowHtml).join('') + '</ul></details>';
+    }
+  }
+  $('list').innerHTML = html;
+}
+
+/* ---------- 操作 ---------- */
+document.querySelector('.tabs').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  page = b.dataset.page; order = null; showAll = false;
+  $('q').value = ''; $('groupSel').value = ''; $('typeSel').value = '';
+  render(); window.scrollTo(0, 0);
+});
+$('q').addEventListener('input', render);
+$('groupSel').addEventListener('change', render);
+$('typeSel').addEventListener('change', render);
+$('onlyTodo').addEventListener('click', () => { onlyTodo = !onlyTodo; render(); });
+$('shuffle').addEventListener('click', () => {
+  if (order) order = null;
+  else {
+    order = itemsOf(page).map(it => it.id);
+    for (let i = order.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1)); [order[i], order[j]] = [order[j], order[i]];
+    }
+  }
+  render();
+});
+$('showAll').addEventListener('click', () => { showAll = true; render(); });
+$('hideAll').addEventListener('click', () => { showAll = false; revealed.clear(); render(); });
+
+$('list').addEventListener('click', e => {
+  const row = e.target.closest('li.row'); if (!row) return;
+  const id = row.dataset.id;
+  const ja = e.target.closest('button.ja');
+  if (ja){
+    const on = !ja.classList.contains('show');
+    ja.classList.toggle('show', on);
+    if (on) revealed.add(id); else { revealed.delete(id); if (showAll){ showAll = false; itemsOf(page).forEach(it => { if (it.id !== id) revealed.add(it.id); }); } }
+    return;
+  }
+  if (e.target.closest('button.edit')) openDialog(id);
+});
+$('list').addEventListener('change', e => {
+  if (e.target.type !== 'checkbox') return;
+  const id = e.target.closest('li.row').dataset.id;
+  if (e.target.checked) state.learned[id] = 1; else delete state.learned[id];
+  save(); render();
+});
+$('list').addEventListener('toggle', e => {
+  const d = e.target; if (!d.matches || !d.matches('details.group')) return;
+  const k = page + '/' + d.dataset.g;
+  if (d.open) collapsed.delete(k); else collapsed.add(k);
+}, true);
+
+/* ---------- 追加・編集 ---------- */
+let editing = null;
+$('typeSel').innerHTML = '<option value="">すべての型</option>' +
+  Object.keys(TYPES).map(k => '<option value="' + k + '">' + TYPES[k] + '</option>').join('');
+$('fType').innerHTML = Object.keys(TYPES).map(k => '<option value="' + k + '">' + TYPES[k] + '</option>').join('');
+
+function openDialog(id){
+  const all = itemsOf(page);
+  editing = id ? all.find(it => it.id === id) : null;
+  const label = {words:'単語', idioms:'イディオム', nouns:'複合名詞'}[page];
+  $('dlgTitle').textContent = label + (editing ? 'を編集' : 'を追加');
+  $('fEn').value = editing ? editing.en : '';
+  $('fJa').value = editing ? editing.ja : '';
+  const isIdiom = page === 'idioms';
+  $('fGroupWrap').hidden = isIdiom;
+  $('fTypeWrap').hidden = !isIdiom;
+  $('fGroup').value = editing ? editing.group : ($('groupSel').value || ADDED);
+  $('groupList').innerHTML = groupNames(all).map(n => '<option value="' + esc(n) + '">').join('');
+  $('fType').value = editing && editing.type ? editing.type : ($('typeSel').value || 2);
+  $('dlgNote').textContent = isIdiom ? 'グループは先頭の動詞から自動で決まります。' : '';
+  $('delBtn').hidden = !editing;
+  $('dlg').showModal();
+  $('fEn').focus();
+}
+$('addBtn').addEventListener('click', () => openDialog(null));
+$('cancelBtn').addEventListener('click', () => $('dlg').close());
+$('form').addEventListener('submit', () => {
+  const en = $('fEn').value.trim(), ja = $('fJa').value.trim();
+  if (!en || !ja) return;
+  const v = {en, ja};
+  if (page === 'idioms') v.type = +$('fType').value; else v.group = $('fGroup').value.trim() || ADDED;
+  if (!editing){
+    state.custom.push(Object.assign({id: 'c' + Date.now() + Math.floor(Math.random() * 1000), page}, v));
+  } else if (editing.custom){
+    Object.assign(state.custom.find(c => c.id === editing.id), v);
+  } else {
+    state.edits[editing.id] = v;
+  }
+  save(); render();
+});
+$('delBtn').addEventListener('click', () => {
+  if (!editing || !confirm('「' + editing.en + '」を削除しますか？')) return;
+  if (editing.custom) state.custom = state.custom.filter(c => c.id !== editing.id);
+  else state.deleted[editing.id] = 1;
+  delete state.learned[editing.id];
+  save(); $('dlg').close(); render();
+});
+
+/* ---------- 書き出し・読み込み（端末の間で移す用） ---------- */
+$('exportBtn').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(state, null, 1)], {type: 'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'イディオム帳データ_' + new Date().toISOString().slice(0, 10) + '.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+});
+$('importBtn').addEventListener('click', () => $('importFile').click());
+$('importFile').addEventListener('change', async e => {
+  const f = e.target.files[0]; e.target.value = '';
+  if (!f) return;
+  let d;
+  try { d = JSON.parse(await f.text()); } catch(err){ alert('このファイルは読み込めません。'); return; }
+  if (!d || typeof d !== 'object' || !Array.isArray(d.custom)){ alert('イディオム帳のデータではないようです。'); return; }
+  if (!confirm('この端末の「覚えた」チェックと追加した内容を、読み込むファイルの内容に置き換えます。よろしいですか？')) return;
+  state = Object.assign(blank(), {learned: d.learned || {}, custom: d.custom, edits: d.edits || {}, deleted: d.deleted || {}});
+  save(); render();
+});
+
+render();
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>
