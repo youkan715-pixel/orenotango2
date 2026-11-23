@@ -1,6 +1,6 @@
 {
-  "name": "イディオム帳",
-  "short_name": "イディオム帳",
+  "name": "単語帳",
+  "short_name": "単語帳",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

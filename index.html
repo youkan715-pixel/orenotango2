@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>イディオム帳</title>
+<title>単語帳</title>
 <meta name="theme-color" content="#1f4e79">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="イディオム帳">
+<meta name="apple-mobile-web-app-title" content="単語帳">
 <style>
 :root{
   --bg:#f5f6f8; --card:#fff; --text:#1c2430; --sub:#6b7686; --line:#e1e5ea;
@@ -84,7 +84,7 @@ dialog textarea{min-height:72px;resize:vertical}
 <body>
 <header>
   <div class="wrap">
-    <div class="tabs" role="tablist" style="display:none">
+    <div class="tabs" role="tablist">
       <button role="tab" data-page="words">単語</button>
       <button role="tab" data-page="idioms">イディオム</button>
       <button role="tab" data-page="nouns">複合名詞</button>
@@ -247,7 +247,7 @@ function render(){
 
   let html = '';
   if (!vis.length){
-    html = '<p class="empty">' + (all.length ? '条件に合うものがありません。' : 'まだ何もありません。') + '</p>';
+    html = '<p class="empty">' + (all.length ? '条件に合うものがありません。' : 'まだ何もありません。下の「＋ 追加」から入れてください。') + '</p>';
   } else if (order){
     const pos = new Map(order.map((id, i) => [id, i]));
     const sorted = vis.slice().sort((a, b) => (pos.get(a.id) ?? 1e9) - (pos.get(b.id) ?? 1e9));
@@ -367,7 +367,7 @@ $('exportBtn').addEventListener('click', () => {
   const blob = new Blob([JSON.stringify(state, null, 1)], {type: 'application/json'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'イディオム帳データ_' + new Date().toISOString().slice(0, 10) + '.json';
+  a.download = '単語帳データ_' + new Date().toISOString().slice(0, 10) + '.json';
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 });
@@ -377,7 +377,7 @@ $('importFile').addEventListener('change', async e => {
   if (!f) return;
   let d;
   try { d = JSON.parse(await f.text()); } catch(err){ alert('このファイルは読み込めません。'); return; }
-  if (!d || typeof d !== 'object' || !Array.isArray(d.custom)){ alert('イディオム帳のデータではないようです。'); return; }
+  if (!d || typeof d !== 'object' || !Array.isArray(d.custom)){ alert('単語帳のデータではないようです。'); return; }
   if (!confirm('この端末の「覚えた」チェックと追加した内容を、読み込むファイルの内容に置き換えます。よろしいですか？')) return;
   state = Object.assign(blank(), {learned: d.learned || {}, custom: d.custom, edits: d.edits || {}, deleted: d.deleted || {}});
   save(); render();
