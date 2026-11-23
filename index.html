@@ -20,6 +20,38 @@
     --accent:#7fb2e0; --accent-text:#0d1620; --mask:#2a323d; --done:#6cc391; --warn:#f2867f; }
 }
 *{box-sizing:border-box}
+/* 長文ページ */
+#reading{display:none}
+.reading #reading{display:block}
+.reading .tools,.reading .pbar,.reading #list,.reading #addBtn{display:none}
+.rcard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:10px}
+.rcard h2{margin:0 0 10px;font-size:17px}
+.rcard h3{margin:14px 0 6px;font-size:14px;color:var(--sub);font-weight:600}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg .btn{flex:1 1 auto}
+.rcard select{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);min-height:40px}
+.ractions{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.rtext{font-size:17px;line-height:1.75;margin:0}
+.rja{margin:10px 0 0;color:var(--sub);font-size:15px;line-height:1.7}
+.hw{border:0;padding:0 2px;margin:0;background:color-mix(in srgb,var(--accent) 16%,transparent);color:inherit;border-radius:4px;font-weight:600}
+.sent{cursor:pointer;border-radius:4px;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.sent.cur{background:color-mix(in srgb,var(--accent) 22%,transparent)}
+.player input[type=range]{width:100%;margin:14px 0 2px;accent-color:var(--accent);height:28px}
+.player .note{margin:0}
+.rtip{margin-top:8px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:15px}
+.rtip:empty{display:none}
+fieldset.q{border:0;padding:0;margin:14px 0 0;min-width:0}
+fieldset.q legend{font-weight:600;padding:0;margin-bottom:6px}
+fieldset.q label{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border:1px solid var(--line);border-radius:8px;margin-top:6px;min-height:44px}
+fieldset.q input{margin-top:4px;accent-color:var(--accent)}
+fieldset.q label.ok{border-color:var(--done);background:color-mix(in srgb,var(--done) 14%,transparent)}
+fieldset.q label.ng{border-color:var(--warn);background:color-mix(in srgb,var(--warn) 12%,transparent)}
+.why{margin:6px 0 0;font-size:14px;color:var(--sub)}
+.rscore{font-size:20px;font-weight:700;margin:0}
+.rtimer{font-size:28px;font-weight:700;font-variant-numeric:tabular-nums;margin:0 0 8px}
+.rlist{list-style:none;margin:8px 0 0;padding:0;font-size:14px}
+.rlist li{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-top:1px solid var(--line)}
+.rlist .res{color:var(--sub);white-space:nowrap}
 [hidden]{display:none!important}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--text);
@@ -31,17 +63,29 @@ header{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px so
   padding:calc(8px + env(safe-area-inset-top)) 12px 8px}
 .wrap{max-width:860px;margin:0 auto}
 .tabs{display:flex;gap:6px}
-.tabs button{flex:1;padding:10px 4px;border:1px solid var(--line);background:var(--card);
+.tabs button{flex:1;padding:10px 2px;font-size:15px;border:1px solid var(--line);background:var(--card);
   border-radius:10px;font-weight:600;min-height:44px}
 .tabs button[aria-selected="true"]{background:var(--accent);color:var(--accent-text);border-color:var(--accent)}
 .tools{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;align-items:center}
+.tools #accentSel{flex:0 0 auto;padding:8px 10px}
 .tools input[type=search],.tools select{flex:1 1 140px;min-width:0;padding:8px 10px;border:1px solid var(--line);
   border-radius:8px;background:var(--card);min-height:40px}
 .btn{padding:8px 12px;border:1px solid var(--line);background:var(--card);border-radius:8px;min-height:40px;white-space:nowrap}
 .btn[aria-pressed="true"]{background:var(--accent);color:var(--accent-text);border-color:var(--accent)}
 .btn.primary{background:var(--accent);color:var(--accent-text);border-color:var(--accent);font-weight:600}
 .btn.danger{color:var(--warn);border-color:var(--warn)}
-.progress{margin-top:6px;font-size:13px;color:var(--sub);font-variant-numeric:tabular-nums}
+.progress{font-size:13px;color:var(--sub);font-variant-numeric:tabular-nums;flex:1;min-width:0}
+.pbar{display:flex;align-items:center;gap:6px;margin-top:6px}
+.btn.sm{min-height:34px;padding:4px 10px;font-size:13px}
+/* 絞り込みを畳んだとき */
+.tools-off .tools{display:none}
+/* しおり：単語の横の印。挟んだカードは左に色の帯が付く */
+.mark{border:0;background:transparent;padding:4px;margin-left:2px;font-size:14px;min-height:32px;vertical-align:middle;opacity:.2}
+li.row.marked .mark{opacity:1}
+li.row.marked{box-shadow:inset 5px 0 0 var(--accent)}
+li.row.flash{animation:flash 1.2s ease-out}
+@keyframes flash{from{background:color-mix(in srgb,var(--accent) 30%,transparent)}to{background:transparent}}
+@media (prefers-reduced-motion: reduce){li.row.flash{animation:none}}
 main{padding:10px 12px 110px}
 details.group{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:10px;overflow:hidden}
 details.group>summary{padding:10px 14px;font-weight:700;cursor:pointer;display:flex;justify-content:space-between;gap:8px;list-style:none}
@@ -68,6 +112,29 @@ button.ja.rev.show .rest{background:transparent;color:inherit}
 button.ja.rev small{display:none;padding:0 8px;color:var(--sub);font-size:12px}
 button.ja.rev.show small{display:block}
 .en.q-ja{font-weight:500}
+button.ja .ipa{display:block;padding:3px 8px 0;color:var(--sub);font-size:13px;font-weight:400}
+/* 例文と読み上げボタンは最初から見せる。日→英のときだけ、例文の文字は答えを開くまで隠す（音は聞ける）。 */
+.ex{grid-column:1/-1;padding:0 14px 12px}
+li.row.rv:not(.open) .ex p{display:none}
+/* 「例文：オフ」のときは、答えを開いたカードだけ例文とボタンを出す */
+.ex-off li.row:not(.open) .ex{display:none}
+/* そのあいだも単語の音だけは聞けるよう、単語の横に小さな読み上げボタンを出す */
+.say.mini{display:none;border:0;background:transparent;padding:4px 6px;margin-left:2px;font-size:16px;min-height:32px;vertical-align:middle}
+.ex-off li.row:not(.open) .say.mini{display:inline-block}
+.no-speech .say.mini{display:none!important}
+.ex button{margin-bottom:4px}
+.ex p{margin:0 0 8px;font-size:15px}
+.ex button{border:1px solid var(--line);background:var(--bg);border-radius:8px;min-height:36px;padding:4px 12px;margin-right:6px;font-size:14px}
+.no-speech .ex .say,.no-speech .ex .voice{display:none}
+.ex .exmsg{display:block;margin-top:6px}
+.ex .exmsg:empty{display:none}
+dialog{max-height:calc(100dvh - 24px);overflow:auto}
+.auto-ex{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px}
+.auto-ex .note{margin:0}
+#spell{margin-top:8px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:14px}
+#spell p{margin:0 0 6px}
+#spell p:last-child{margin-bottom:0}
+#spell button{border:1px solid var(--accent);color:var(--accent);background:transparent;border-radius:8px;min-height:36px;padding:4px 12px;margin:2px 6px 2px 0;font-weight:600}
 li.row.rv{grid-template-columns:minmax(0,7fr) minmax(0,5fr) 44px 36px}
 .chk{display:flex;align-items:center;justify-content:center}
 .chk input{width:22px;height:22px;accent-color:var(--done)}
@@ -97,6 +164,7 @@ dialog textarea{min-height:72px;resize:vertical}
       <button role="tab" data-page="words">単語</button>
       <button role="tab" data-page="idioms">イディオム</button>
       <button role="tab" data-page="nouns">複合名詞</button>
+      <button role="tab" data-page="reading">長文</button>
     </div>
     <div class="tools">
       <input type="search" id="q" placeholder="検索" aria-label="検索">
@@ -105,20 +173,25 @@ dialog textarea{min-height:72px;resize:vertical}
     </div>
     <div class="tools">
       <button class="btn" id="dirBtn" aria-pressed="false">英→日</button>
+      <button class="btn" id="exBtn"></button>
+      <select class="btn" id="accentSel" aria-label="発音"></select>
       <button class="btn" id="onlyTodo" aria-pressed="false">未習得のみ</button>
       <button class="btn" id="shuffle" aria-pressed="false">シャッフル</button>
       <button class="btn" id="showAll">全部見せる</button>
       <button class="btn" id="hideAll">全部隠す</button>
     </div>
-    <div class="progress" id="progress"></div>
+    <div class="pbar"><span class="progress" id="progress"></span>
+      <button class="btn sm" id="markBtn" hidden>🔖 しおりへ</button>
+      <button class="btn sm" id="foldBtn"></button></div>
   </div>
 </header>
 
-<main><div class="wrap" id="list"></div></main>
+<main><div class="wrap" id="list"></div><div class="wrap" id="reading"></div></main>
 
 <footer>
   <div class="wrap">
     <button class="btn primary" id="addBtn">＋ 追加</button>
+    <button class="btn" id="voiceBtn">声</button>
     <button class="btn" id="exportBtn">書き出し</button>
     <button class="btn" id="importBtn">読み込み</button>
     <input type="file" id="importFile" accept="application/json,.json" hidden>
@@ -129,7 +202,10 @@ dialog textarea{min-height:72px;resize:vertical}
   <form method="dialog" id="form">
     <h2 id="dlgTitle">追加</h2>
     <label>英語<input id="fEn" required autocomplete="off" autocapitalize="off" spellcheck="false"></label>
+    <div id="spell" hidden></div>
     <label>日本語<textarea id="fJa" required></textarea></label>
+    <label>例文（英語・なくてもよい）<textarea id="fEx" autocapitalize="sentences" spellcheck="false"></textarea></label>
+    <div class="auto-ex"><button type="button" class="btn" id="autoEx">例文を自動で入れる</button><span class="note" id="autoExMsg"></span></div>
     <label id="fGroupWrap">グループ<select id="fGroupSel"></select><input id="fGroup" autocomplete="off" placeholder="新しいグループの名前" aria-label="新しいグループの名前"></label>
     <label id="fTypeWrap">型<select id="fType"></select></label>
     <p class="note" id="dlgNote"></p>
@@ -142,7 +218,29 @@ dialog textarea{min-height:72px;resize:vertical}
   </form>
 </dialog>
 
+<dialog id="voiceDlg">
+  <h2>声の設定</h2>
+  <label>発音<select id="vAccent"></select></label>
+  <label>声<select id="vSel"></select></label>
+  <label>速さ<select id="vRate">
+    <option value="0.7">ゆっくり</option>
+    <option value="0.9">ややゆっくり</option>
+    <option value="1">ふつう</option>
+    <option value="1.15">速め</option>
+  </select></label>
+  <p class="note" id="vCount"></p>
+  <p class="note" id="vNone" hidden>この端末では英語の声が見つかりませんでした。</p>
+  <p class="note">もっと自然な声にしたいときは、端末の設定で高品質の英語の声を追加すると、ここに出てきます。</p>
+  <div class="dlg-actions">
+    <button type="button" class="btn" id="vTest">🔊 試し聞き</button>
+    <span class="sp"></span>
+    <button type="button" class="btn primary" id="vClose">閉じる</button>
+  </div>
+</dialog>
+
 <script src="data.js"></script>
+<script src="examples.js"></script>
+<script src="passages.js"></script>
 <script>
 'use strict';
 const TYPES = {
@@ -189,7 +287,7 @@ const BASE = {
 };
 
 /* ---------- 保存データ（この端末の中） ---------- */
-function blank(){ return {learned:{}, custom:[], edits:{}, deleted:{}}; }
+function blank(){ return {learned:{}, custom:[], edits:{}, deleted:{}, reading:{}, marks:{}}; }
 function load(){
   try { return Object.assign(blank(), JSON.parse(localStorage.getItem(KEY)) || {}); }
   catch(e){ return blank(); }
@@ -199,6 +297,229 @@ function save(){
   try { localStorage.setItem(KEY, JSON.stringify(state)); }
   catch(e){ alert('保存できませんでした。ブラウザの設定で保存が止められている可能性があります。'); }
 }
+
+/* ---------- 例文と読み上げ ---------- */
+const EX = typeof EXAMPLES === 'undefined' ? {} : EXAMPLES;
+const canSpeak = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+if (!canSpeak) document.documentElement.classList.add('no-speech');
+// 読み上げ用に、(名) などの注記と日本語を取り除く
+function spoken(en){ return en.replace(/[(（][^)）]*[)）]/g, ' ').replace(/[^\x20-\x7E]/g, ' ').replace(/\s+/g, ' ').trim(); }
+// 声えらび。端末には効果音のような声（ロボット声・ささやき声など）も入っているので、それらは除く。
+const ODD_VOICES = /^(Albert|Bad News|Bahh|Bells|Boing|Bubbles|Cellos|Deranged|Good News|Hysterical|Jester|Organ|Pipe Organ|Superstar|Trinoids|Whisper|Wobble|Zarvox|Fred|Junior|Kathy|Ralph|Princess|Eddy|Flo|Grandma|Grandpa|Reed|Rocko|Sandy|Shelley)\b/;
+const FEMALE = ['Ava','Zoe','Samantha','Allison','Susan','Joelle','Noelle','Nicky','Google US English','Aria','Jenny','Michelle','Zira','Karen','Serena','Kate','Stephanie','Martha','Moira','Tessa','Catherine','Google UK English Female'];
+const MALE = ['Evan','Nathan','Tom','Alex','Aaron','Guy','David','Mark','Daniel','Oliver','Arthur','Gordon','Rishi','Lee','Google UK English Male'];
+const inList = (list, name) => list.findIndex(n => name === n || name.startsWith(n + ' ') || name.includes(' ' + n + ' ') || name.endsWith(' ' + n));
+// 日本語の端末では、効果音の声が日本語名で出るので、それも除く（ふつうの声が日本語名の端末もあるので、名前を決め打ちする）
+const ODD_JA = ['ささやき声', 'オルガン', 'スーパースター', 'トリノイド', 'ベル', '道化', '震え'];
+const isLocalizedOdd = name => ODD_JA.some(n => name.startsWith(n));
+function gender(v){ return inList(FEMALE, v.name) >= 0 ? '女性' : inList(MALE, v.name) >= 0 ? '男性' : ''; }
+// 発音の種類。全体で切り替える。「すべて」は国を問わず全部の声を使う。
+const ACCENTS = {US: ['アメリカ', 'en-US'], GB: ['イギリス', 'en-GB'], AU: ['オーストラリア', 'en-AU'], IN: ['インド', 'en-IN'], IE: ['アイルランド', 'en-IE'], ZA: ['南アフリカ', 'en-ZA'], ALL: ['すべて', '']};
+function accent(){ const a = pref('accent', 'US'); return ACCENTS[a] ? a : 'US'; }
+function englishVoices(){
+  if (!canSpeak) return [];
+  const want = ACCENTS[accent()][1];
+  const score = v => {
+    let n = 0;
+    if (/Premium|Enhanced|Natural|Neural/i.test(v.name)) n -= 100;   // 高品質版を最優先
+    const f = inList(FEMALE, v.name), m = inList(MALE, v.name);
+    n += f >= 0 ? f : m >= 0 ? m : 50;                                // 知っている自然な声を上に
+    if (v.lang.replace('_', '-') !== 'en-US') n += 25;                // アメリカ英語を先に
+    return n;
+  };
+  return speechSynthesis.getVoices()
+    .filter(v => v.lang && v.lang.toLowerCase().startsWith('en') && !ODD_VOICES.test(v.name) && !isLocalizedOdd(v.name))
+    .filter(v => !want || v.lang.replace('_', '-').toLowerCase() === want.toLowerCase())
+    .sort((x, y) => score(x) - score(y) || x.name.localeCompare(y.name));
+}
+function pref(k, d){ try { return localStorage.getItem(KEY + '-' + k) || d; } catch(e){ return d; } }
+function setPref(k, v){ try { localStorage.setItem(KEY + '-' + k, v); } catch(e){} }
+function makeUtter(text){
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US'; u.rate = +pref('rate', '0.9');
+  const vs = englishVoices(), want = pref('voice', '');
+  const v = vs.find(x => x.name === want) || vs[0];
+  if (v){ u.voice = v; u.lang = v.lang.replace('_', '-'); }
+  else u.lang = ACCENTS[accent()][1] || 'en-US';   // その発音の声が一覧になくても、端末に任せて読ませる
+  return u;
+}
+function speak(text){
+  if (!canSpeak || !text) return;
+  speechSynthesis.cancel(); speechSynthesis.speak(makeUtter(text));
+}
+function fillVoices(){
+  const vs = englishVoices(), want = pref('voice', '');
+  $('vSel').innerHTML = '<option value="">おまかせ' + (vs[0] ? '（' + esc(vs[0].name) + '）' : '') + '</option>' +
+    vs.map(v => '<option value="' + esc(v.name) + '"' + (v.name === want ? ' selected' : '') + '>' +
+      esc(v.name) + '　' + [gender(v), v.lang.replace('_', '-')].filter(Boolean).join('・') + '</option>').join('');
+  $('vRate').value = pref('rate', '0.9');
+  $('vAccent').value = accent();
+  $('vNone').hidden = vs.length > 0;
+  $('vCount').textContent = 'この端末で使える声：' + vs.length + ' 個（端末に入っている声は全部で ' + speechSynthesis.getVoices().length + ' 個）';
+  $('vNone').textContent = 'この端末には、' + (accent() === 'ALL' ? '英語' : ACCENTS[accent()][0] + '英語') + 'の声が見つかりませんでした。端末の設定で声を追加すると使えます。';
+}
+if (canSpeak){
+  speechSynthesis.getVoices();   // 一覧が遅れて届く端末があるので、起動時に取りにいっておく
+  speechSynthesis.onvoiceschanged = () => { if ($('voiceDlg').open) fillVoices(); };
+}
+
+/* ---------- 発音記号（単語ページだけ） ---------- */
+// 発音辞書 CMUdict（アメリカ英語）から作った一覧を読み込む。読めるまでは記号なしで表示する。
+let IPA = null;
+fetch('ipa.txt').then(r => r.ok ? r.text() : Promise.reject()).then(t => {
+  const m = new Map();
+  for (const line of t.split('\n')){ const i = line.indexOf('\t'); if (i > 0) m.set(line.slice(0, i), line.slice(i + 1)); }
+  IPA = m;
+  if (page === 'words') render();
+}).catch(() => {});
+// 複数の語からなるものは1語ずつ引いて並べる。1語でも辞書になければ出さない。
+function ipaOf(it){
+  if (!IPA || it.page !== 'words') return '';
+  const words = spoken(it.en).toLowerCase().split(/[^a-z]+/).filter(w => w && !(w.length === 1 && 'ab'.includes(w) && /\b[AB]\b/.test(it.en)));
+  const out = words.map(w => IPA.get(w));
+  return words.length && out.every(Boolean) ? '/' + out.join(' ') + '/' : '';
+}
+
+/* ---------- 例文を自動で入れる（ネット接続が必要） ---------- */
+// 無料の例文集 Tatoeba から探し、なければ無料の英語辞書から探す。押すたびに別の文を出す。
+async function findExample(en, now){
+  const words = spoken(en).split(' ').filter(Boolean);
+  const core = words.filter(w => w !== 'A' && w !== 'B');          // identify A with B → identify with
+  if (!core.length) return '';
+  const q = core.length === words.length ? '"' + core.join(' ') + '"' : core.join(' ');
+  const ok = t => t && t.length <= 140 && t !== now;
+  const r = await fetch('https://api.tatoeba.org/unstable/sentences?lang=eng&sort=random&limit=20&word_count=6-14&q=' + encodeURIComponent(q));
+  if (r.ok){
+    // 検索は活用形や派生語（resilient → resilience）も拾うので、入力した形そのままを含む文を優先する
+    const list = ((await r.json()).data || []).map(x => x.text).filter(ok);
+    const exact = core.join(' ').toLowerCase();
+    const hit = list.find(t => t.toLowerCase().includes(exact)) || list[0];
+    if (hit) return hit;
+  }
+  const d = await fetch('https://api.dictionaryapi.dev/api/v2/entries/en/' + encodeURIComponent(core.join(' ')));
+  if (d.ok){
+    const list = (await d.json()).flatMap(e => e.meanings || []).flatMap(m => m.definitions || []).map(x => x.example).filter(ok);
+    if (list.length) return list[Math.floor(Math.random() * list.length)];
+  }
+  return '';
+}
+$('autoEx').addEventListener('click', async () => {
+  const en = $('fEn').value.trim(), msg = $('autoExMsg');
+  if (!en){ msg.textContent = '先に英語を入力してください。'; return; }
+  $('autoEx').disabled = true; msg.textContent = '探しています…';
+  try {
+    const ex = await findExample(en, $('fEx').value.trim());
+    if (ex){ $('fEx').value = ex; msg.textContent = '気に入らなければ、もう一度押すと別の文になります。'; }
+    else msg.textContent = '例文が見つかりませんでした。自分で入力してください。';
+  } catch(e){
+    msg.textContent = 'ネットにつながっていないようです。自分で入力するか、あとで試してください。';
+  }
+  $('autoEx').disabled = false;
+});
+
+// カードの例文をその場で入れ替える。入れ替えた文は保存し、すぐ読み上げる。
+function setExample(it, ex){
+  if (it.custom){ const c = state.custom.find(x => x.id === it.id); if (c) c.ex = ex; }
+  else state.edits[it.id] = Object.assign({}, state.edits[it.id], {ex});   // ex が空なら最初の例文に戻る
+  save();
+}
+async function swapExample(it, btn){
+  const msg = btn.parentNode.querySelector('.exmsg'), label = btn.textContent;
+  btn.disabled = true; btn.textContent = '探しています…'; msg.textContent = '';
+  try {
+    const ex = await findExample(it.en, it.ex || EX[it.id] || '');
+    if (ex){ setExample(it, ex); render(); speak(ex); return; }
+    msg.textContent = '別の例文が見つかりませんでした。';
+  } catch(e){
+    msg.textContent = 'ネットにつながっていないようです。';
+  }
+  btn.disabled = false; btn.textContent = label;
+}
+
+/* ---------- つづりの確認（追加・編集画面の「もしかして」） ---------- */
+// 辞書は追加画面を初めて開いたときに読み込む。読めなければ何も出さない（追加はふつうにできる）。
+let DICT = null, BYLEN = null, COMMON = null, dictLoading = null;
+function loadDict(){
+  if (!dictLoading) dictLoading = fetch('dict.txt').then(r => r.ok ? r.text() : Promise.reject()).then(t => {
+    const d = new Set(t.split('\n'));
+    // このアプリに入っている語は「よく使う語」として優先する
+    COMMON = new Set();
+    const own = PAGES.flatMap(p => BASE[p].map(it => it.en)).concat(Object.values(EX)).join(' ').toLowerCase().match(/[a-z]+/g) || [];
+    for (const w of own){ COMMON.add(w); d.add(w); }
+    BYLEN = {};
+    for (const w of d) (BYLEN[w.length] || (BYLEN[w.length] = [])).push(w);
+    DICT = d;
+  }).catch(() => { dictLoading = null; });
+  return dictLoading;
+}
+// 辞書にない活用形（複数形・過去形など）を、元の形に戻して確かめる
+function known(w){
+  if (DICT.has(w)) return true;
+  const tries = [];
+  if (w.endsWith('ies')) tries.push(w.slice(0, -3) + 'y');
+  if (w.endsWith('es')) tries.push(w.slice(0, -2));
+  if (w.endsWith('s')) tries.push(w.slice(0, -1));
+  if (w.endsWith('ied')) tries.push(w.slice(0, -3) + 'y');
+  if (w.endsWith('ed')) tries.push(w.slice(0, -2), w.slice(0, -1), w.slice(0, -3));
+  if (w.endsWith('ing')) tries.push(w.slice(0, -3), w.slice(0, -3) + 'e', w.slice(0, -4));
+  if (w.endsWith('ly')) tries.push(w.slice(0, -2));
+  if (w.endsWith('er')) tries.push(w.slice(0, -2), w.slice(0, -1));
+  if (w.endsWith('est')) tries.push(w.slice(0, -3), w.slice(0, -2));
+  return tries.some(t => t.length > 1 && DICT.has(t));
+}
+// 何文字直せば同じになるか（入れ替え・抜け・余分・違い）。max を超えたら打ち切る。
+function distance(a, b, max){
+  const n = a.length, m = b.length;
+  let prev2 = null, prev = Array.from({length: m + 1}, (_, j) => j);
+  for (let i = 1; i <= n; i++){
+    const cur = [i]; let best = i;
+    for (let j = 1; j <= m; j++){
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      let v = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + cost);
+      if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) v = Math.min(v, prev2[j - 2] + 1);
+      cur[j] = v; if (v < best) best = v;
+    }
+    if (best > max) return max + 1;
+    prev2 = prev; prev = cur;
+  }
+  return prev[m];
+}
+function suggest(w){
+  const max = w.length <= 4 ? 1 : 2, found = [];
+  for (let len = w.length - max; len <= w.length + max; len++){
+    for (const c of BYLEN[len] || []){
+      const d = distance(w, c, max);
+      if (d <= max) found.push([d * 10 - (COMMON.has(c) ? 6 : 0) - (c[0] === w[0] ? 3 : 0), c]);
+    }
+  }
+  return found.sort((x, y) => x[0] - y[0] || x[1].localeCompare(y[1])).slice(0, 3).map(x => x[1]);
+}
+let spellTimer = 0;
+function checkSpelling(){
+  const box = $('spell');
+  if (!DICT){ box.hidden = true; return; }
+  // 3文字以上の語だけ見る。A・B や RSVP のような大文字だけの語は見ない。
+  const words = ($('fEn').value.match(/[A-Za-z]+/g) || []).filter(w => w.length >= 3 && w !== w.toUpperCase());
+  let html = '';
+  for (const w of new Set(words)){
+    const lw = w.toLowerCase();
+    if (known(lw)) continue;
+    const cands = suggest(lw);
+    if (!cands.length) continue;
+    const cap = w[0] !== lw[0];
+    html += '<p>「' + esc(w) + '」は、もしかして：<br>' + cands.map(c => {
+      const to = cap ? c[0].toUpperCase() + c.slice(1) : c;
+      return '<button type="button" data-from="' + esc(w) + '" data-to="' + esc(to) + '">' + esc(to) + '</button>';
+    }).join('') + '</p>';
+  }
+  box.innerHTML = html; box.hidden = !html;
+}
+$('fEn').addEventListener('input', () => { clearTimeout(spellTimer); spellTimer = setTimeout(checkSpelling, 350); });
+$('spell').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  $('fEn').value = $('fEn').value.replace(new RegExp('\\b' + b.dataset.from + '\\b'), b.dataset.to);
+  checkSpelling(); $('fEn').focus();
+});
 
 /* ---------- 画面の状態 ---------- */
 let page = 'idioms';
@@ -241,21 +562,38 @@ function rowHtml(it){
   if (it.type) badges += '<span class="badge" title="' + esc(TYPES[it.type]) + '">' + TYPE_MARK[it.type] + '</span>';
   if (it.dup) badges += '<span class="badge">' + esc(it.dup) + '回登場</span>';
   const orig = it.orig ? '<small>メモのつづり：' + esc(it.orig) + '</small>' : '';
+  const ipa = ipaOf(it), ipaHtml = ipa ? '<small class="ipa">' + esc(ipa) + '</small>' : '';
+  const mini = '<button type="button" class="say mini" data-say="w" aria-label="単語を読み上げ">🔊</button>';
+  const marked = (state.marks || {})[page] === it.id;
+  const mark = '<button type="button" class="mark" aria-pressed="' + marked + '" aria-label="ここにしおりを挟む" title="ここにしおりを挟む">🔖</button>';
   let q, a;
   if (rev){
     const [hint, rest] = hintSplit(it);
-    q = '<div class="en q-ja">' + esc(it.ja) + badges + '</div>';
-    a = '<span><i class="hint">' + esc(hint) + '</i><i class="rest">' + esc(rest) + '</i></span>' + orig;
+    q = '<div class="en q-ja">' + esc(it.ja) + badges + mini + mark + '</div>';
+    a = '<span><i class="hint">' + esc(hint) + '</i><i class="rest">' + esc(rest) + '</i></span>' + ipaHtml + orig;
   } else {
-    q = '<div class="en">' + esc(it.en) + badges + orig + '</div>';
-    a = '<span>' + esc(it.ja) + '</span>';
+    q = '<div class="en">' + esc(it.en) + badges + mini + mark + orig + '</div>';
+    a = '<span>' + esc(it.ja) + '</span>' + ipaHtml;
   }
-  return '<li class="row' + (rev ? ' rv' : '') + (state.learned[it.id] ? ' learned' : '') + '" data-id="' + esc(it.id) + '">' + q +
+  const ex = it.ex || EX[it.id] || '';
+  const exHtml = '<div class="ex">' + (ex ? '<p>' + esc(ex) + '</p>' : '') +
+    '<button type="button" class="say" data-say="w">🔊 単語</button>' +
+    (ex ? '<button type="button" class="say" data-say="e">🔊 例文</button>' : '') +
+    '<button type="button" class="swap">🔄 別の例文</button>' +
+    '<button type="button" class="voice">🗣 声を変える</button>' +
+    (!it.custom && it.ex && EX[it.id] && it.ex !== EX[it.id] ? '<button type="button" class="orig">↩ 元の例文</button>' : '') +
+    '<span class="note exmsg"></span></div>';
+  return '<li class="row' + (rev ? ' rv' : '') + (marked ? ' marked' : '') + (shown ? ' open' : '') + (state.learned[it.id] ? ' learned' : '') + '" data-id="' + esc(it.id) + '">' + q +
     '<button type="button" class="ja' + (rev ? ' rev' : '') + (shown ? ' show' : '') + '" aria-label="答えを表示・非表示">' + a + '</button>' +
     '<label class="chk"><input type="checkbox" aria-label="覚えた"' + (state.learned[it.id] ? ' checked' : '') + '></label>' +
-    '<button type="button" class="edit" aria-label="編集">⋯</button></li>';
+    '<button type="button" class="edit" aria-label="編集">⋯</button>' + exHtml + '</li>';
 }
 function render(){
+  document.documentElement.classList.toggle('reading', page === 'reading');
+  if (page === 'reading'){
+    document.querySelectorAll('.tabs button').forEach(b => b.setAttribute('aria-selected', b.dataset.page === page));
+    renderReading(); return;
+  }
   const all = itemsOf(page), names = groupNames(all);
   // グループの選択肢
   const cur = $('groupSel').value;
@@ -266,11 +604,21 @@ function render(){
   $('onlyTodo').setAttribute('aria-pressed', onlyTodo);
   $('dirBtn').setAttribute('aria-pressed', dir === 'ja');
   $('dirBtn').textContent = dir === 'ja' ? '日→英' : '英→日';
+  $('accentSel').value = accent();
+  const exOn = pref('ex', 'on') === 'on';
+  $('exBtn').textContent = '例文：' + (exOn ? 'オン' : 'オフ');
+  $('exBtn').setAttribute('aria-pressed', exOn);
+  document.documentElement.classList.toggle('ex-off', !exOn);
   $('shuffle').setAttribute('aria-pressed', !!order);
 
   const vis = visible(all);
   const done = all.filter(it => state.learned[it.id]).length;
   $('progress').textContent = '覚えた ' + done + ' / ' + all.length + '　表示中 ' + vis.length + ' 件';
+  const folded = pref('fold', 'off') === 'on';
+  document.documentElement.classList.toggle('tools-off', folded);
+  $('foldBtn').textContent = folded ? '▼ 絞り込み' : '▲ 畳む';
+  $('foldBtn').setAttribute('aria-expanded', !folded);
+  $('markBtn').hidden = !all.some(it => it.id === (state.marks || {})[page]);
 
   let html = '';
   if (!vis.length){
@@ -296,6 +644,7 @@ function render(){
 /* ---------- 操作 ---------- */
 document.querySelector('.tabs').addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
+  stopReading();
   page = b.dataset.page; order = null; showAll = false;
   $('q').value = ''; $('groupSel').value = ''; $('typeSel').value = '';
   render(); window.scrollTo(0, 0);
@@ -324,12 +673,43 @@ $('hideAll').addEventListener('click', () => { showAll = false; revealed.clear()
 
 $('list').addEventListener('click', e => {
   const row = e.target.closest('li.row'); if (!row) return;
+  if (e.target.closest('button.mark')){
+    // しおりは各ページに1つ。同じカードをもう一度押すと外す。
+    state.marks = state.marks || {};
+    if (state.marks[page] === row.dataset.id) delete state.marks[page]; else state.marks[page] = row.dataset.id;
+    save(); render(); return;
+  }
   const id = row.dataset.id;
   const ja = e.target.closest('button.ja');
   if (ja){
     const on = !ja.classList.contains('show');
-    ja.classList.toggle('show', on);
+    ja.classList.toggle('show', on); row.classList.toggle('open', on);
     if (on) revealed.add(id); else { revealed.delete(id); if (showAll){ showAll = false; itemsOf(page).forEach(it => { if (it.id !== id) revealed.add(it.id); }); } }
+    return;
+  }
+  if (e.target.closest('button.voice')){
+    // 次の声に切り替えて、その声ですぐ読む
+    const it = itemsOf(page).find(x => x.id === id), vs = englishVoices(), msg = row.querySelector('.exmsg');
+    if (!it) return;
+    if (vs.length < 2){ msg.textContent = accent() === 'ALL' ? (vs.length ? 'この端末に入っている英語の声は1つだけでした。端末の設定で英語の声を追加すると切り替えられます。' : 'この端末では声の一覧を取得できませんでした。読み上げは端末の標準の声で行います。もう一度押すと取得できることがあります。') : 'この端末の' + ACCENTS[accent()][0] + '英語の声は' + (vs.length ? '1つだけ' : '見つかりません') + 'でした。上の「発音」を「すべて」にすると、ほかの国の声も使えます。'; if (vs.length) speak(it.ex || EX[it.id] || spoken(it.en)); return; }
+    const cur = pref('voice', '') || vs[0].name;
+    const v = vs[(vs.findIndex(x => x.name === cur) + 1) % vs.length];
+    setPref('voice', v.name);
+    msg.textContent = '声：' + v.name + '（' + [gender(v), v.lang.replace('_', '-')].filter(Boolean).join('・') + '）';
+    speak(it.ex || EX[it.id] || spoken(it.en));
+    return;
+  }
+  const swap = e.target.closest('button.swap'), back = e.target.closest('button.orig');
+  if (swap || back){
+    const it = itemsOf(page).find(x => x.id === id); if (!it) return;
+    if (back){ setExample(it, ''); render(); return; }
+    swapExample(it, swap);
+    return;
+  }
+  const say = e.target.closest('button.say');
+  if (say){
+    const it = itemsOf(page).find(x => x.id === id); if (!it) return;
+    speak(say.dataset.say === 'e' ? (it.ex || EX[it.id] || '') : spoken(it.en));
     return;
   }
   if (e.target.closest('button.edit')) openDialog(id);
@@ -362,6 +742,7 @@ function openDialog(id){
   $('dlgTitle').textContent = label + (editing ? 'を編集' : 'を追加');
   $('fEn').value = editing ? editing.en : '';
   $('fJa').value = editing ? editing.ja : '';
+  $('fEx').value = editing ? (editing.ex || EX[editing.id] || '') : '';
   const isIdiom = page === 'idioms';
   $('fTypeWrap').hidden = !isIdiom;
   // 単語は自由入力。イディオムと複合名詞は今あるグループから選ぶ。
@@ -382,7 +763,9 @@ function openDialog(id){
   $('fType').value = editing && editing.type ? editing.type : ($('typeSel').value || 2);
   $('dlgNote').textContent = isIdiom ? '「自動」のままにすると、先頭の動詞でグループが決まります。' : '';
   $('delBtn').hidden = !editing;
+  $('spell').hidden = true; $('autoExMsg').textContent = '';
   $('dlg').showModal();
+  loadDict().then(checkSpelling);
   $('fEn').focus();
 }
 $('addBtn').addEventListener('click', () => openDialog(null));
@@ -390,7 +773,7 @@ $('cancelBtn').addEventListener('click', () => $('dlg').close());
 $('form').addEventListener('submit', () => {
   const en = $('fEn').value.trim(), ja = $('fJa').value.trim();
   if (!en || !ja) return;
-  const v = {en, ja};
+  const v = {en, ja, ex: $('fEx').value.trim()};
   const typed = $('fGroup').value.trim(), sel = $('fGroupSel').value;
   if (page === 'words') v.group = typed || ADDED;
   else if (page === 'nouns') v.group = sel === NEW_GROUP ? (typed || ADDED) : sel;
@@ -429,8 +812,241 @@ $('importFile').addEventListener('change', async e => {
   try { d = JSON.parse(await f.text()); } catch(err){ alert('このファイルは読み込めません。'); return; }
   if (!d || typeof d !== 'object' || !Array.isArray(d.custom)){ alert('単語帳のデータではないようです。'); return; }
   if (!confirm('この端末の「覚えた」チェックと追加した内容を、読み込むファイルの内容に置き換えます。よろしいですか？')) return;
-  state = Object.assign(blank(), {learned: d.learned || {}, custom: d.custom, edits: d.edits || {}, deleted: d.deleted || {}});
+  state = Object.assign(blank(), {learned: d.learned || {}, custom: d.custom, edits: d.edits || {}, deleted: d.deleted || {}, reading: d.reading || {}, marks: d.marks || {}});
   save(); render();
+});
+
+$('voiceBtn').hidden = !canSpeak;
+$('voiceBtn').addEventListener('click', () => { fillVoices(); $('voiceDlg').showModal(); });
+$('exBtn').addEventListener('click', () => { setPref('ex', pref('ex', 'on') === 'on' ? 'off' : 'on'); render(); });
+// 発音は一覧から選ぶ（上のボタン列と、声の設定画面の両方。どちらで変えても連動する）
+$('accentSel').innerHTML = Object.keys(ACCENTS).map(k => '<option value="' + k + '">発音：' + ACCENTS[k][0] + '</option>').join('');
+$('vAccent').innerHTML = Object.keys(ACCENTS).map(k => '<option value="' + k + '">' + ACCENTS[k][0] + (k === 'ALL' ? '（国を問わない）' : '英語') + '</option>').join('');
+$('accentSel').hidden = !canSpeak;
+$('accentSel').addEventListener('change', () => { setPref('accent', $('accentSel').value); render(); });
+$('vAccent').addEventListener('change', () => { setPref('accent', $('vAccent').value); fillVoices(); render(); });
+$('vSel').addEventListener('change', () => setPref('voice', $('vSel').value));
+$('vRate').addEventListener('change', () => setPref('rate', $('vRate').value));
+$('vTest').addEventListener('click', () => speak('The meeting has been moved to three o\'clock on Friday.'));
+$('vClose').addEventListener('click', () => $('voiceDlg').close());
+
+/* ---------- 絞り込みを畳む・しおりへ移動 ---------- */
+$('foldBtn').addEventListener('click', () => { setPref('fold', pref('fold', 'off') === 'on' ? 'off' : 'on'); render(); });
+$('markBtn').addEventListener('click', () => {
+  const id = (state.marks || {})[page]; if (!id) return;
+  const find = () => [...document.querySelectorAll('li.row')].find(l => l.dataset.id === id);
+  let row = find();
+  if (!row){
+    // 絞り込みで隠れているときは、絞り込みを外して探す
+    $('q').value = ''; $('groupSel').value = ''; $('typeSel').value = ''; onlyTodo = false;
+    render(); row = find();
+  }
+  if (!row) return;
+  const g = row.closest('details.group');
+  if (g && !g.open){ g.open = true; collapsed.delete(page + '/' + g.dataset.g); }
+  row.scrollIntoView({block: 'center'});
+  row.classList.remove('flash'); void row.offsetWidth; row.classList.add('flash');
+});
+
+/* ---------- 長文（リスニング・速読） ---------- */
+const PS = typeof PASSAGES === 'undefined' ? [] : PASSAGES;
+const SRC = {words: '単語', idioms: 'イディオム', nouns: '複合名詞'};
+// stage: pick（選ぶ）→ run（聞く・読む）→ review（答え合わせ）
+// 読み上げは1文ずつ。cur = いま読んでいる（次に読む）文の番号。巻き戻しや頭出しは文の単位で行う。
+// 長文が1本もない種類は、選ぶボタンを出さない（配布用では単語の長文がないため）
+const SRCKEYS = Object.keys(SRC).filter(k => PS.some(p => p.page === k));
+const R = {srcs: SRCKEYS.slice(0, 1), group: '', mode: 'listen', stage: 'pick', p: null, ans: [], t0: 0, secs: 0, showText: false, showJa: false, playing: false, tip: '', timer: 0, play: 0, sents: [], cur: 0, perm: []};
+// srcs = 選んだ種類（複数可）。group は「種類|グループ名」で持つ（種類が違っても同じ名前がありうるため）。
+// 1本の長文が複数のグループにまたがることがある（語の少ない動詞をまとめた長文など）
+const groupsOf = p => [].concat(p.group);
+const gl = p => groupsOf(p).join('・');
+const gkeys = p => groupsOf(p).map(g => p.page + '|' + g);
+const pool = () => PS.filter(p => R.srcs.includes(p.page) && (!R.group || gkeys(p).includes(R.group)));
+const wordsIn = p => p.text.trim().split(/\s+/).length;
+const resultOf = p => (state.reading || {})[p.id];
+// Mr. や Dr. の点では文を切らない（いったん別の記号に置き換えてから切り、あとで戻す）
+const sentencesOf = text => (text.replace(/\b(Mr|Mrs|Ms|Dr|Prof|St|Jr|Sr)\./g, '$1\u0000').match(/[^.!?]+[.!?]+["']?\s*/g) || [text])
+  .map(t => t.replace(/\u0000/g, '.').trim()).filter(Boolean);
+function resultText(p){
+  const r = resultOf(p); if (!r) return '';
+  return '済 ' + r.score + '/' + r.n + (r.wpm ? '・' + r.wpm + '語/分' : '');
+}
+function stopReading(){
+  R.play++; R.playing = false;          // 先に番号を進め、止めたあとに届く「読み終わり」の合図を無視する
+  if (canSpeak) speechSynthesis.cancel();
+  clearInterval(R.timer);
+}
+// i 番目の文から最後まで読む
+function playFrom(i){
+  if (!canSpeak || !R.sents.length) return;
+  const token = ++R.play;
+  speechSynthesis.cancel();
+  R.playing = true; R.cur = Math.min(Math.max(i, 0), R.sents.length - 1);
+  R.sents.slice(R.cur).forEach((t, k) => {
+    const n = R.cur + k, u = makeUtter(t);
+    u.onstart = () => { if (token === R.play){ R.cur = n; updatePlayer(); } };
+    if (n === R.sents.length - 1) u.onend = () => { if (token === R.play){ R.playing = false; R.cur = 0; updatePlayer(); } };
+    speechSynthesis.speak(u);
+  });
+  updatePlayer();
+}
+// 再生まわりだけ書き換える（画面全体を作り直すと、バーの操作やスクロール位置が崩れるため）
+function updatePlayer(){
+  const box = $('reading'), b = box.querySelector('[data-act="play"]');
+  if (b){ b.textContent = R.playing ? '■ 止める' : '▶ 再生'; b.classList.toggle('primary', !R.playing); }
+  if ($('rSeek')) $('rSeek').value = R.cur;
+  if ($('rPos')) $('rPos').textContent = posText(R.cur);
+  box.querySelectorAll('.sent').forEach(el => el.classList.toggle('cur', R.playing && +el.dataset.i === R.cur));
+}
+const posText = i => '文 ' + (i + 1) + ' / ' + R.sents.length + '（バーを動かすと、その文から読みます）';
+function playerHtml(){
+  if (!canSpeak) return '<p class="note">この端末は読み上げに対応していません。</p>';
+  return '<div class="player"><div class="ractions">' +
+    '<button type="button" class="btn' + (R.playing ? '' : ' primary') + '" data-act="play">' + (R.playing ? '■ 止める' : '▶ 再生') + '</button>' +
+    '<button type="button" class="btn" data-act="restart">⏮ 最初から</button></div>' +
+    '<input type="range" id="rSeek" min="0" max="' + (R.sents.length - 1) + '" step="1" value="' + R.cur + '" aria-label="再生位置">' +
+    '<p class="note" id="rPos">' + posText(R.cur) + '</p></div>';
+}
+// 本文を1文ずつの部品にする。タップでその文から読む。withWords のときは、そのグループの語に色を付ける。
+function textHtml(p, withWords){
+  const used = new Set();
+  return R.sents.map((sent, i) => {
+    let t = sent; const marks = [];
+    if (withWords) p.words.forEach(([surface, id], w) => {
+      if (used.has(w)) return;
+      const k = t.indexOf(surface); if (k < 0) return;
+      used.add(w); marks.push([surface, id]);
+      t = t.slice(0, k) + '\u0001' + (marks.length - 1) + '\u0002' + t.slice(k + surface.length);
+    });
+    const inner = esc(t).replace(/\u0001(\d+)\u0002/g, (_, n) =>
+      '<button type="button" class="hw" data-act="tip" data-id="' + esc(marks[n][1]) + '">' + esc(marks[n][0]) + '</button>');
+    return '<span class="sent' + (R.playing && i === R.cur ? ' cur' : '') + '" data-act="sent" data-i="' + i + '">' + inner + '</span>';
+  }).join(' ');
+}
+const jaHtml = p => '<div class="ractions"><button type="button" class="btn" data-act="ja">' + (R.showJa ? '和訳を隠す' : '和訳を表示') + '</button></div>' +
+  (R.showJa ? '<p class="rja">' + esc(p.ja) + '</p>' : '');
+function questionsHtml(p, review){
+  return p.qs.map((q, i) => '<fieldset class="q"><legend>' + (i + 1) + '. ' + esc(q.q) + '</legend>' +
+    // 選択肢は出題のたびに並べ替える（正解の位置を覚えてしまわないように）。j は元の番号、k は表示上の位置。
+    (R.perm[i] || [0, 1, 2, 3]).map((j, k) => {
+      const o = q.o[j], cls = review ? (j === q.a ? ' class="ok"' : R.ans[i] === j ? ' class="ng"' : '') : '';
+      return '<label' + cls + '><input type="radio" name="q' + i + '" value="' + j + '"' + (R.ans[i] === j ? ' checked' : '') + (review ? ' disabled' : '') + '>' +
+        '<span>(' + 'ABCD'[k] + ') ' + esc(o) + (review && j === q.a ? '　← 正解' : '') + '</span></label>';
+    }).join('') + (review ? '<p class="why">' + esc(q.why) + '</p>' : '') + '</fieldset>').join('');
+}
+function renderReading(){
+  const box = $('reading'), p = R.p;
+  let h = '';
+  if (R.stage === 'pick'){
+    const multi = R.srcs.length > 1;
+    const groups = [...new Set(PS.filter(x => R.srcs.includes(x.page)).flatMap(gkeys))];
+    if (R.group && !groups.includes(R.group)) R.group = '';
+    const gname = k => { const i = k.indexOf('|'); return (multi ? SRC[k.slice(0, i)] + '｜' : '') + k.slice(i + 1); };
+    const list = pool(), done = list.filter(resultOf).length;
+    h = '<div class="rcard"><h2>長文でリスニング・速読</h2>' +
+      '<h3>どの語から？（複数選べます）</h3><div class="seg">' + SRCKEYS.map(k =>
+        '<button type="button" class="btn" data-act="src" data-v="' + k + '" aria-pressed="' + R.srcs.includes(k) + '">' + SRC[k] + '</button>').join('') + '</div>' +
+      '<h3>グループ</h3><select id="rGroup" aria-label="グループ"><option value="">ランダム（全グループから）</option>' +
+        groups.map(g => '<option value="' + esc(g) + '"' + (g === R.group ? ' selected' : '') + '>' + esc(gname(g)) + '</option>').join('') + '</select>' +
+      '<h3>練習</h3><div class="seg">' +
+        '<button type="button" class="btn" data-act="mode" data-v="listen" aria-pressed="' + (R.mode === 'listen') + '">リスニング</button>' +
+        '<button type="button" class="btn" data-act="mode" data-v="speed" aria-pressed="' + (R.mode === 'speed') + '">速読</button></div>' +
+      (list.length
+        ? '<p class="note">この条件の長文：' + list.length + ' 本（済 ' + done + ' 本）。まだやっていないものから出します。</p>' +
+          '<div class="ractions"><button type="button" class="btn primary" data-act="start">スタート</button></div>'
+        : '<p class="note">この条件の長文は、まだありません。</p>') +
+      (R.mode === 'listen' && !canSpeak ? '<p class="note">この端末は読み上げに対応していないため、リスニングは使えません。</p>' : '') +
+      '</div>' +
+      (list.length ? '<div class="rcard"><h2>長文の一覧</h2><ul class="rlist">' + list.map(x =>
+        '<li><span>' + (multi ? SRC[x.page] + '｜' : '') + esc(gl(x)) + '｜' + esc(x.kind) + '（' + wordsIn(x) + '語）</span><span class="res">' + (resultText(x) || '未') + '</span></li>').join('') + '</ul></div>' : '');
+  } else if (R.stage === 'run'){
+    const head = '<h2>' + (R.mode === 'listen' ? 'リスニング' : '速読') + '｜' + esc(gl(p)) + '｜' + esc(p.kind) + '</h2>';
+    if (R.mode === 'listen'){
+      h = '<div class="rcard">' + head + '<p class="note">発音・声・速さは下の「声」から変えられます。</p>' + playerHtml() +
+        '<div class="ractions"><button type="button" class="btn" data-act="text">' + (R.showText ? '本文を隠す' : '本文を表示') + '</button></div>' +
+        (R.showText ? '<p class="note">文をタップすると、その文の頭から読みます。</p><p class="rtext">' + textHtml(p, false) + '</p>' + jaHtml(p) : '') +
+        '</div>' +
+        '<div class="rcard"><h2>設問</h2>' + questionsHtml(p, false) +
+        '<div class="ractions"><button type="button" class="btn primary" data-act="check">答え合わせ</button><button type="button" class="btn" data-act="quit">やめる</button></div></div>';
+    } else if (!R.t0 && !R.secs){
+      h = '<div class="rcard">' + head + '<p class="note">「スタート」を押すと本文（' + wordsIn(p) + '語）が出て、時間を計ります。読み終わったら「読み終わった」を押してください。</p>' +
+        '<div class="ractions"><button type="button" class="btn primary" data-act="begin">スタート</button><button type="button" class="btn" data-act="quit">やめる</button></div></div>';
+    } else if (R.t0){
+      h = '<div class="rcard">' + head + '<p class="rtimer" id="rTimer">0 秒</p><p class="rtext">' + esc(p.text) + '</p>' +
+        '<div class="ractions"><button type="button" class="btn primary" data-act="finish">読み終わった</button></div></div>';
+    } else {
+      h = '<div class="rcard">' + head + '<p class="rscore">' + R.secs + ' 秒・' + Math.round(wordsIn(p) / R.secs * 60) + ' 語/分</p>' +
+        '<p class="note">TOEIC のリーディングは、1分あたり150語前後で読めると時間内に解き終えやすいと言われます。</p>' +
+        (R.showText ? '<p class="rtext">' + esc(p.text) + '</p>' : '') +
+        '<div class="ractions"><button type="button" class="btn" data-act="text">' + (R.showText ? '本文を隠す' : '本文を見る') + '</button></div></div>' +
+        '<div class="rcard"><h2>設問</h2>' + questionsHtml(p, false) +
+        '<div class="ractions"><button type="button" class="btn primary" data-act="check">答え合わせ</button><button type="button" class="btn" data-act="quit">やめる</button></div></div>';
+    }
+  } else {
+    const r = resultOf(p) || {score: 0, n: p.qs.length};
+    h = '<div class="rcard"><h2>結果｜' + esc(gl(p)) + '｜' + esc(p.kind) + '</h2>' +
+      '<p class="rscore">' + r.n + ' 問中 ' + r.score + ' 問 正解' + (r.wpm ? '　' + r.wpm + ' 語/分' : '') + '</p>' +
+      '<div class="ractions"><button type="button" class="btn primary" data-act="next">次の長文</button><button type="button" class="btn" data-act="quit">選ぶ画面へ</button></div></div>' +
+      '<div class="rcard"><h2>設問と解説</h2>' + questionsHtml(p, true) + '</div>' +
+      '<div class="rcard"><h2>本文</h2>' + playerHtml() +
+      '<p class="note">色の付いた語が、このグループの語です。語をタップすると意味が出ます。それ以外の所をタップすると、その文の頭から読みます。</p>' +
+      '<p class="rtext">' + textHtml(p, true) + '</p><div class="rtip" id="rTip">' + R.tip + '</div>' + jaHtml(p) + '</div>';
+  }
+  box.innerHTML = h;
+}
+function startPassage(){
+  const list = pool(); if (!list.length) return;
+  const fresh = list.filter(x => !resultOf(x) && x !== R.p);
+  const from = fresh.length ? fresh : (list.length > 1 ? list.filter(x => x !== R.p) : list);
+  stopReading();
+  const p = from[Math.floor(Math.random() * from.length)];
+  Object.assign(R, {p, stage: 'run', ans: [], t0: 0, secs: 0, showText: false, showJa: false, tip: '', sents: sentencesOf(p.text), cur: 0,
+    perm: p.qs.map(() => { const a = [0, 1, 2, 3]; for (let i = 3; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; })});
+  renderReading(); window.scrollTo(0, 0);
+}
+$('reading').addEventListener('input', e => { if (e.target.id === 'rSeek') $('rPos').textContent = posText(+e.target.value); });
+$('reading').addEventListener('change', e => {
+  if (e.target.id === 'rGroup'){ R.group = e.target.value; renderReading(); }
+  else if (e.target.id === 'rSeek'){ if (R.playing) playFrom(+e.target.value); else { R.cur = +e.target.value; updatePlayer(); } }
+  else if (e.target.type === 'radio') R.ans[+e.target.name.slice(1)] = +e.target.value;   // 画面は作り直さない
+});
+$('reading').addEventListener('click', e => {
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  const act = b.dataset.act, p = R.p;
+  if (act === 'src'){
+    // 押すたびに選ぶ・外すを切り替える。最後の1つは外せない。
+    const v = b.dataset.v, on = R.srcs.includes(v);
+    if (on && R.srcs.length === 1) return;
+    R.srcs = SRCKEYS.filter(k => k === v ? !on : R.srcs.includes(k));
+  }
+  else if (act === 'mode') R.mode = b.dataset.v;
+  else if (act === 'start' || act === 'next'){ startPassage(); return; }
+  else if (act === 'quit'){ stopReading(); R.stage = 'pick'; R.p = null; }
+  else if (act === 'play'){ if (R.playing){ stopReading(); updatePlayer(); } else playFrom(R.cur); return; }
+  else if (act === 'restart'){ playFrom(0); return; }
+  else if (act === 'sent'){ playFrom(+b.dataset.i); return; }
+  else if (act === 'begin'){
+    R.t0 = Date.now();
+    R.timer = setInterval(() => { const t = $('rTimer'); if (t) t.textContent = Math.floor((Date.now() - R.t0) / 1000) + ' 秒'; }, 500);
+  }
+  else if (act === 'finish'){ clearInterval(R.timer); R.secs = Math.max(1, Math.round((Date.now() - R.t0) / 1000)); R.t0 = 0; }
+  else if (act === 'text'){ R.showText = !R.showText; if (!R.showText) R.showJa = false; }
+  else if (act === 'ja') R.showJa = !R.showJa;
+  else if (act === 'check'){
+    stopReading(); R.cur = 0;
+    const score = p.qs.filter((q, i) => R.ans[i] === q.a).length;
+    const rec = {score, n: p.qs.length, mode: R.mode, at: Date.now()};
+    if (R.mode === 'speed' && R.secs) rec.wpm = Math.round(wordsIn(p) / R.secs * 60);
+    state.reading = state.reading || {}; state.reading[p.id] = rec; save();
+    R.stage = 'review'; R.showJa = false; renderReading(); window.scrollTo(0, 0); return;
+  }
+  else if (act === 'tip'){
+    const [pg] = b.dataset.id.split(':');
+    const it = itemsOf(pg).find(x => x.id === b.dataset.id);
+    R.tip = '<b>' + esc(it ? it.en : b.textContent) + '</b>　' + esc(it ? it.ja : '（このカードは見つかりませんでした）');
+    $('rTip').innerHTML = R.tip; return;
+  }
+  renderReading();
 });
 
 render();
