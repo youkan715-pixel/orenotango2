@@ -62,8 +62,8 @@ button{cursor:pointer}
 header{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);
   padding:calc(8px + env(safe-area-inset-top)) 12px 8px}
 .wrap{max-width:860px;margin:0 auto}
-.tabs{display:flex;gap:6px}
-.tabs button{flex:1;padding:10px 2px;font-size:15px;border:1px solid var(--line);background:var(--card);
+.tabs{display:flex;gap:4px}
+.tabs button{flex:1 1 0;min-width:0;padding:6px 1px;font-size:clamp(11px,3.3vw,15px);line-height:1.25;word-break:keep-all;border:1px solid var(--line);background:var(--card);
   border-radius:10px;font-weight:600;min-height:44px}
 .tabs button[aria-selected="true"]{background:var(--accent);color:var(--accent-text);border-color:var(--accent)}
 .tools{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;align-items:center}
@@ -101,6 +101,10 @@ li.row{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr) 44px 36px;
 li.row.learned .en{color:var(--sub)}
 .en{padding:10px 8px 10px 14px;font-weight:600;overflow-wrap:anywhere}
 .en small{display:block;font-weight:400;color:var(--sub);font-size:12px}
+.pos{display:inline-block;font-size:11px;font-weight:700;border-radius:6px;padding:0 5px;margin-right:6px;background:var(--line);color:var(--text,inherit);vertical-align:middle;white-space:nowrap}
+.posbox{display:flex;flex-wrap:wrap;gap:4px 12px;margin:2px 0 8px}
+.posbox label{display:flex;align-items:center;gap:4px;margin:0;font-weight:400}
+.posbox input{width:auto}
 .badge{display:inline-block;font-size:11px;font-weight:600;border:1px solid var(--line);border-radius:6px;padding:0 5px;margin-left:4px;color:var(--sub);vertical-align:middle}
 button.ja{border:0;background:transparent;text-align:left;padding:8px;margin:0;min-height:44px;overflow-wrap:anywhere}
 button.ja span{display:block;padding:2px 8px;border-radius:8px;background:var(--mask);color:transparent;user-select:none;min-height:1.5em}
@@ -161,20 +165,23 @@ dialog textarea{min-height:72px;resize:vertical}
 <header>
   <div class="wrap">
     <div class="tabs" role="tablist">
-      <button role="tab" data-page="words">単語</button>
+      <button role="tab" data-page="freq">頻出<wbr>単語</button>
+      <button role="tab" data-page="words">間違えた<wbr>単語</button>
       <button role="tab" data-page="idioms">イディオム</button>
-      <button role="tab" data-page="nouns">複合名詞</button>
+      <button role="tab" data-page="nouns">複合<wbr>名詞</button>
       <button role="tab" data-page="reading">長文</button>
     </div>
     <div class="tools">
       <input type="search" id="q" placeholder="検索" aria-label="検索">
       <select id="groupSel" aria-label="グループ"></select>
       <select id="typeSel" aria-label="イディオムの型" hidden></select>
+      <select id="posSel" aria-label="品詞" hidden></select>
     </div>
     <div class="tools">
       <button class="btn" id="dirBtn" aria-pressed="false">英→日</button>
       <button class="btn" id="exBtn"></button>
       <select class="btn" id="accentSel" aria-label="発音"></select>
+      <button class="btn" id="posBtn" aria-pressed="false" hidden></button>
       <button class="btn" id="onlyTodo" aria-pressed="false">未習得のみ</button>
       <button class="btn" id="shuffle" aria-pressed="false">シャッフル</button>
       <button class="btn" id="showAll">全部見せる</button>
@@ -208,6 +215,7 @@ dialog textarea{min-height:72px;resize:vertical}
     <div class="auto-ex"><button type="button" class="btn" id="autoEx">例文を自動で入れる</button><span class="note" id="autoExMsg"></span></div>
     <label id="fGroupWrap">グループ<select id="fGroupSel"></select><input id="fGroup" autocomplete="off" placeholder="新しいグループの名前" aria-label="新しいグループの名前"></label>
     <label id="fTypeWrap">型<select id="fType"></select></label>
+    <div id="fPosWrap"><span>品詞（選ばなければ自動）</span><div class="posbox" id="fPos"></div></div>
     <p class="note" id="dlgNote"></p>
     <div class="dlg-actions">
       <button type="button" class="btn danger" id="delBtn">削除</button>
@@ -240,6 +248,8 @@ dialog textarea{min-height:72px;resize:vertical}
 
 <script src="data.js"></script>
 <script src="examples.js"></script>
+<script src="freq.js"></script>
+<script src="pos.js"></script>
 <script src="passages.js"></script>
 <script>
 'use strict';
@@ -248,7 +258,15 @@ const TYPES = {
   4:'④ 動詞＋副詞＋前置詞', 5:'⑤ 動詞＋A＋前置詞＋B'
 };
 const TYPE_MARK = {1:'①',2:'②',3:'③',4:'④',5:'⑤'};
-const PAGES = ['words','idioms','nouns'];
+const PAGES = ['freq','words','idioms','nouns'];
+const LABEL = {freq: '頻出単語', words: '間違えた単語', idioms: 'イディオム', nouns: '複合名詞'};
+// 品詞。記号は pos.js と同じ。
+const POS_NAME = {n: '名詞', v: '動詞', a: '形容詞', d: '副詞', r: '前置詞', c: '接続詞', k: '代名詞', i: '間投詞', p: '熟語'};
+const POS_MARK = {n: '名', v: '動', a: '形', d: '副', r: '前', c: '接', k: '代', i: '間', p: '熟'};
+const NO_POS = '品詞なし';
+function posOf(it){ return hasIpa(it.page) ? (it.pos || POS[it.en] || POS[it.en.toLowerCase()] || '') : ''; }
+function posHtml(it){ const p = posOf(it); return p ? '<span class="pos">' + [...p].map(c => POS_MARK[c]).join('・') + '</span>' : ''; }
+const hasIpa = p => p === 'words' || p === 'freq';
 const ADDED = '自分で追加';
 const KEY = 'idioms-v1';
 const $ = id => document.getElementById(id);
@@ -281,6 +299,7 @@ function idiomGroups(items){
   }
 }
 const BASE = {
+  freq: parseGrouped('freq', FREQ),
   words: parseGrouped('words', WORDS),
   idioms: parseIdioms(IDIOMS),
   nouns: parseGrouped('nouns', NOUNS)
@@ -370,11 +389,11 @@ fetch('ipa.txt').then(r => r.ok ? r.text() : Promise.reject()).then(t => {
   const m = new Map();
   for (const line of t.split('\n')){ const i = line.indexOf('\t'); if (i > 0) m.set(line.slice(0, i), line.slice(i + 1)); }
   IPA = m;
-  if (page === 'words') render();
+  if (hasIpa(page)) render();
 }).catch(() => {});
 // 複数の語からなるものは1語ずつ引いて並べる。1語でも辞書になければ出さない。
 function ipaOf(it){
-  if (!IPA || it.page !== 'words') return '';
+  if (!IPA || !hasIpa(it.page)) return '';
   const words = spoken(it.en).toLowerCase().split(/[^a-z]+/).filter(w => w && !(w.length === 1 && 'ab'.includes(w) && /\b[AB]\b/.test(it.en)));
   const out = words.map(w => IPA.get(w));
   return words.length && out.every(Boolean) ? '/' + out.join(' ') + '/' : '';
@@ -522,12 +541,15 @@ $('spell').addEventListener('click', e => {
 });
 
 /* ---------- 画面の状態 ---------- */
-let page = 'idioms';
+let page = 'freq';
 let onlyTodo = false, order = null, showAll = false;
 let dir = 'en'; // 'en' = 英語を見て日本語を答える / 'ja' = 日本語を見て英語を答える
 try { if (localStorage.getItem(KEY + '-dir') === 'ja') dir = 'ja'; } catch(e){}
 const revealed = new Set(), collapsed = new Set();
 
+// 「間違えた単語」にある語。頻出単語のページで印を付けるのに使う。
+let MINE = null;
+function mine(){ return MINE || (MINE = new Set(itemsOf('words').map(it => it.en.toLowerCase()))); }
 function itemsOf(p){
   const base = BASE[p].filter(it => !state.deleted[it.id]).map(it => Object.assign({}, it, state.edits[it.id] || {}));
   const all = base.concat(state.custom.filter(c => c.page === p).map(c => Object.assign({custom: true}, c)));
@@ -543,10 +565,14 @@ function groupNames(items){
   }
   return seen;
 }
+// 見出しを品詞にするか（頻出単語・間違えた単語だけ）
+function groupByPos(){ return hasIpa(page) && pref('bypos', 'off') === 'on'; }
 function visible(items){
-  const q = $('q').value.trim().toLowerCase(), g = $('groupSel').value, t = $('typeSel').value;
+  const q = $('q').value.trim().toLowerCase(), byPos = groupByPos(), g = byPos ? '' : $('groupSel').value, t = $('typeSel').value;
+  const ps = hasIpa(page) ? $('posSel').value : '';
   return items.filter(it =>
     (!g || it.group === g) &&
+    (!ps || (ps === '-' ? !posOf(it) : posOf(it).includes(ps))) &&
     (page !== 'idioms' || !t || String(it.type) === t) &&
     (!onlyTodo || !state.learned[it.id]) &&
     (!q || it.en.toLowerCase().includes(q) || it.ja.toLowerCase().includes(q)));
@@ -560,6 +586,7 @@ function rowHtml(it){
   const shown = showAll || revealed.has(it.id), rev = dir === 'ja';
   let badges = '';
   if (it.type) badges += '<span class="badge" title="' + esc(TYPES[it.type]) + '">' + TYPE_MARK[it.type] + '</span>';
+  if (it.page === 'freq' && mine().has(it.en.toLowerCase())) badges += '<span class="badge">間違えた単語にもある</span>';
   if (it.dup) badges += '<span class="badge">' + esc(it.dup) + '回登場</span>';
   const orig = it.orig ? '<small>メモのつづり：' + esc(it.orig) + '</small>' : '';
   const ipa = ipaOf(it), ipaHtml = ipa ? '<small class="ipa">' + esc(ipa) + '</small>' : '';
@@ -569,11 +596,11 @@ function rowHtml(it){
   let q, a;
   if (rev){
     const [hint, rest] = hintSplit(it);
-    q = '<div class="en q-ja">' + esc(it.ja) + badges + mini + mark + '</div>';
+    q = '<div class="en q-ja">' + posHtml(it) + esc(it.ja) + badges + mini + mark + '</div>';
     a = '<span><i class="hint">' + esc(hint) + '</i><i class="rest">' + esc(rest) + '</i></span>' + ipaHtml + orig;
   } else {
     q = '<div class="en">' + esc(it.en) + badges + mini + mark + orig + '</div>';
-    a = '<span>' + esc(it.ja) + '</span>' + ipaHtml;
+    a = '<span>' + posHtml(it) + esc(it.ja) + '</span>' + ipaHtml;
   }
   const ex = it.ex || EX[it.id] || '';
   const exHtml = '<div class="ex">' + (ex ? '<p>' + esc(ex) + '</p>' : '') +
@@ -594,12 +621,18 @@ function render(){
     document.querySelectorAll('.tabs button').forEach(b => b.setAttribute('aria-selected', b.dataset.page === page));
     renderReading(); return;
   }
+  MINE = null;
   const all = itemsOf(page), names = groupNames(all);
   // グループの選択肢
   const cur = $('groupSel').value;
   $('groupSel').innerHTML = '<option value="">すべてのグループ</option>' +
     names.map(n => '<option' + (n === cur ? ' selected' : '') + '>' + esc(n) + '</option>').join('');
   $('typeSel').hidden = page !== 'idioms';
+  const byPos = groupByPos();
+  $('posSel').hidden = $('posBtn').hidden = !hasIpa(page);
+  $('groupSel').hidden = byPos;
+  $('posBtn').textContent = '見出し：' + (byPos ? '品詞' : 'グループ');
+  $('posBtn').setAttribute('aria-pressed', byPos);
   document.querySelectorAll('.tabs button').forEach(b => b.setAttribute('aria-selected', b.dataset.page === page));
   $('onlyTodo').setAttribute('aria-pressed', onlyTodo);
   $('dirBtn').setAttribute('aria-pressed', dir === 'ja');
@@ -628,16 +661,20 @@ function render(){
     const sorted = vis.slice().sort((a, b) => (pos.get(a.id) ?? 1e9) - (pos.get(b.id) ?? 1e9));
     html = '<div class="flat"><ul class="rows">' + sorted.map(rowHtml).join('') + '</ul></div>';
   } else {
-    for (const n of names){
-      const inG = vis.filter(it => it.group === n);
+    // 見出しが品詞のときは、品詞が2つある語は両方の見出しに出る
+    const heads = byPos ? Object.keys(POS_NAME).map(c => POS_NAME[c]).concat(NO_POS) : names;
+    const inHead = byPos ? (it, n) => { const p = posOf(it); return n === NO_POS ? !p : [...p].some(c => POS_NAME[c] === n); } : (it, n) => it.group === n;
+    for (const n of heads){
+      const inG = vis.filter(it => inHead(it, n));
       if (!inG.length) continue;
-      const total = all.filter(it => it.group === n);
+      const total = all.filter(it => inHead(it, n));
       const d = total.filter(it => state.learned[it.id]).length;
       html += '<details class="group" data-g="' + esc(n) + '"' + (collapsed.has(page + '/' + n) ? '' : ' open') + '>' +
         '<summary><span class="gname">' + esc(n) + '</span><span class="cnt">' + d + ' / ' + total.length + '</span></summary>' +
         '<ul class="rows">' + inG.map(rowHtml).join('') + '</ul></details>';
     }
   }
+  if (page === 'freq') html += '<p class="note">語の一覧と順番：TOEIC Service List 1.2（Browne, C. &amp; Culligan, B., 2016, www.newgeneralservicelist.com）CC BY-SA 4.0。和訳と例文はこのアプリで付けたものです。</p>';
   $('list').innerHTML = html;
 }
 
@@ -646,12 +683,15 @@ document.querySelector('.tabs').addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
   stopReading();
   page = b.dataset.page; order = null; showAll = false;
-  $('q').value = ''; $('groupSel').value = ''; $('typeSel').value = '';
+  $('q').value = ''; $('groupSel').value = ''; $('typeSel').value = ''; $('posSel').value = '';
   render(); window.scrollTo(0, 0);
 });
 $('q').addEventListener('input', render);
 $('groupSel').addEventListener('change', render);
 $('typeSel').addEventListener('change', render);
+$('posSel').innerHTML = '<option value="">すべての品詞</option>' + Object.keys(POS_NAME).map(c => '<option value="' + c + '">' + POS_NAME[c] + '</option>').join('') + '<option value="-">' + NO_POS + '</option>';
+$('posSel').addEventListener('change', render);
+$('posBtn').addEventListener('click', () => { setPref('bypos', groupByPos() ? 'off' : 'on'); render(); });
 $('dirBtn').addEventListener('click', () => {
   dir = dir === 'ja' ? 'en' : 'ja'; showAll = false; revealed.clear();
   try { localStorage.setItem(KEY + '-dir', dir); } catch(e){}
@@ -738,13 +778,15 @@ $('fGroupSel').addEventListener('change', () => { syncGroupInput(); if (!$('fGro
 function openDialog(id){
   const all = itemsOf(page);
   editing = id ? all.find(it => it.id === id) : null;
-  const label = {words:'単語', idioms:'イディオム', nouns:'複合名詞'}[page];
+  const label = page === 'words' ? '単語' : LABEL[page];
   $('dlgTitle').textContent = label + (editing ? 'を編集' : 'を追加');
   $('fEn').value = editing ? editing.en : '';
   $('fJa').value = editing ? editing.ja : '';
   $('fEx').value = editing ? (editing.ex || EX[editing.id] || '') : '';
   const isIdiom = page === 'idioms';
   $('fTypeWrap').hidden = !isIdiom;
+  $('fPosWrap').hidden = !hasIpa(page);
+  $('fPos').innerHTML = Object.keys(POS_NAME).map(c => '<label><input type="checkbox" value="' + c + '"' + (editing && (editing.pos || '').includes(c) ? ' checked' : '') + '>' + POS_NAME[c] + '</label>').join('');
   // 単語は自由入力。イディオムと複合名詞は今あるグループから選ぶ。
   const pick = page !== 'words';
   $('fGroupSel').hidden = !pick;
@@ -774,9 +816,10 @@ $('form').addEventListener('submit', () => {
   const en = $('fEn').value.trim(), ja = $('fJa').value.trim();
   if (!en || !ja) return;
   const v = {en, ja, ex: $('fEx').value.trim()};
+  if (hasIpa(page)) v.pos = [...$('fPos').querySelectorAll('input:checked')].map(i => i.value).join('');
   const typed = $('fGroup').value.trim(), sel = $('fGroupSel').value;
   if (page === 'words') v.group = typed || ADDED;
-  else if (page === 'nouns') v.group = sel === NEW_GROUP ? (typed || ADDED) : sel;
+  else if (page !== 'idioms') v.group = sel === NEW_GROUP ? (typed || ADDED) : sel;
   else { v.type = +$('fType').value; v.g = sel === NEW_GROUP ? typed : sel; }
   if (!editing){
     state.custom.push(Object.assign({id: 'c' + Date.now() + Math.floor(Math.random() * 1000), page}, v));
@@ -838,7 +881,7 @@ $('markBtn').addEventListener('click', () => {
   let row = find();
   if (!row){
     // 絞り込みで隠れているときは、絞り込みを外して探す
-    $('q').value = ''; $('groupSel').value = ''; $('typeSel').value = ''; onlyTodo = false;
+    $('q').value = ''; $('groupSel').value = ''; $('typeSel').value = ''; $('posSel').value = ''; onlyTodo = false;
     render(); row = find();
   }
   if (!row) return;
@@ -850,7 +893,7 @@ $('markBtn').addEventListener('click', () => {
 
 /* ---------- 長文（リスニング・速読） ---------- */
 const PS = typeof PASSAGES === 'undefined' ? [] : PASSAGES;
-const SRC = {words: '単語', idioms: 'イディオム', nouns: '複合名詞'};
+const SRC = LABEL;
 // stage: pick（選ぶ）→ run（聞く・読む）→ review（答え合わせ）
 // 読み上げは1文ずつ。cur = いま読んでいる（次に読む）文の番号。巻き戻しや頭出しは文の単位で行う。
 // 長文が1本もない種類は、選ぶボタンを出さない（配布用では単語の長文がないため）

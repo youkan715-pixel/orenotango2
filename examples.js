@@ -1,4 +1,4 @@
-// 例文データ（配布用）。カードのID → 例文。
+// 例文データ。カードのID → 例文。
 const EXAMPLES = {"idioms:1:back down":"The union refused to back down on its pay demands.",
 "idioms:2:back up":"Can you back up your claim with data?",
 "idioms:4:back out of":"The investor backed out of the deal at the last minute.",
